@@ -24,12 +24,15 @@
     <ClCompile Include="src\runApp.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\GUI.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\include\Engine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\include\Game.h">
+    <ClInclude Include="src\include\GUI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

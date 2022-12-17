@@ -84,14 +84,14 @@
     <LibraryPath>C:\coding\Connect4_Game\Connect4_Game\Libraries\SDL2\lib\x64;C:\coding\Connect4_Game\Connect4_Game\Libraries\SDL2_image\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(SolutionDir)$(ProjectName)\bin\$(Configuration)</OutDir>
-    <IntDir>$(SolutionDir)$(ProjectName)\bin\$(Configuration)\intermediate</IntDir>
+    <OutDir>$(SolutionDir)$(ProjectName)\bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)$(ProjectName)\bin\$(Configuration)\intermediate\</IntDir>
     <IncludePath>$(SolutionDir)$(ProjectName)\Libraries\SDL2\include;$(SolutionDir)$(ProjectName)\Libraries\SDL2_image\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)$(ProjectName)\Libraries\SDL2\lib\x64;$(SolutionDir)$(ProjectName)\Libraries\SDL2_image\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(SolutionDir)$(ProjectName)\bin\$(Configuration)</OutDir>
-    <IntDir>$(SolutionDir)$(ProjectName)\bin\$(Configuration)\intermediate</IntDir>
+    <OutDir>$(SolutionDir)$(ProjectName)\bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)$(ProjectName)\bin\$(Configuration)\intermediate\</IntDir>
     <IncludePath>$(SolutionDir)$(ProjectName)\Libraries\SDL2\include;$(SolutionDir)$(ProjectName)\Libraries\SDL2_image\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)$(ProjectName)\Libraries\SDL2\lib\x64;$(SolutionDir)$(ProjectName)\Libraries\SDL2_image\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
@@ -168,11 +168,12 @@
   <ItemGroup>
     <ClCompile Include="src\Engine.c" />
     <ClCompile Include="src\Game.c" />
+    <ClCompile Include="src\GUI.c" />
     <ClCompile Include="src\runApp.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\include\Engine.h" />
-    <ClInclude Include="src\include\Game.h" />
+    <ClInclude Include="src\include\GUI.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
