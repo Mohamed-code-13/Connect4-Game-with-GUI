@@ -11,6 +11,9 @@ typedef struct
 {
 	char board[ROWS][COLS];
 	bool p1First;
+
+	int log[20];
+	int currMove, totalMoves;
 } Game;
 
 typedef struct
@@ -25,3 +28,5 @@ Game createNewGame();
 
 void initializeBoard(char board[ROWS][COLS]);
 void makeMove(Game* game, int col);
+void undoMove(Game* game);
+void redoMove(Game* game);

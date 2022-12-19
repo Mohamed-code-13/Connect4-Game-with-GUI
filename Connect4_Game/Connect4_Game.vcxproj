@@ -173,6 +173,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\include\Engine.h" />
+    <ClInclude Include="src\include\Game.h" />
     <ClInclude Include="src\include\GUI.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

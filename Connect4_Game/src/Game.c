@@ -33,6 +33,20 @@ void runGame()
 
 					makeMove(&game, col);
 				}
+				else if (e.type == SDL_KEYDOWN)
+				{
+					switch (e.key.keysym.sym)
+					{
+					case SDLK_LEFT:
+						undoMove(&game);
+						break;
+					case SDLK_RIGHT:
+						redoMove(&game);
+						break;
+					default:
+						break;
+					}
+				}
 			}
 
 			draw(&game);
