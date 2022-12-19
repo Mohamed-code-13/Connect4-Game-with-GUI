@@ -30,3 +30,7 @@ void initializeBoard(char board[ROWS][COLS]);
 void makeMove(Game* game, int col);
 void undoMove(Game* game);
 void redoMove(Game* game);
+void updateScore(Game* game, Player* player, int col);
+int calcVertically(Game* game, int c);
+int calcHorizontally(Game* game, int c);
+int calcDiagonally(Game* game, int c);

@@ -33,9 +33,15 @@ void makeMove(Game* game, int col)
 		if (game->board[i][col] == '-')
 		{
 			if (game->p1First)
+			{
 				game->board[i][col] = p1.color;
+				updateScore(game, &p1, col);
+			}
 			else
+			{
 				game->board[i][col] = p2.color;
+				updateScore(game, &p2, col);
+			}
 
 			flipPlayer(game);
 			
@@ -73,4 +79,99 @@ void redoMove(Game* game)
 	int c = game->log[game->currMove];
 	
 	makeMove(game, c);
+}
+
+void updateScore(Game* game, Player* player, int c)
+{
+	player->score += calcVertically(game, c);
+	player->score += calcHorizontally(game, c);
+	player->score += calcDiagonally(game, c);
+}
+
+int getRow(Game* game, int c)
+{
+	for (int i = 0; i < ROWS; ++i)
+		if (game->board[i][c] != '-')
+			return i;
+
+	return -1;
+}
+
+int calcVertically(Game* game, int c)
+{
+	int r = getRow(game, c);
+	char color = game->board[r][c];
+
+	int connected = 0;
+	for (int i = r; i < r + 4 && i < ROWS; ++i)
+		if (game->board[i][c] == color)
+			connected++;
+
+	return connected == 4;
+}
+
+int calcHorizontally(Game* game, int c)
+{
+	int r = getRow(game, c);
+	char color = game->board[r][c];
+	int directions[4][2] = { {0, 3}, {1, 2}, {2, 1}, {3, 0} };
+
+	int connected = 0;
+	for (int i = 0; i < 4; ++i)
+	{
+		int left = directions[i][0], right = directions[i][1], currConnected = 1;
+		
+		for (int x = 1; x <= left && (c - x) >= 0; ++x)
+			if (game->board[r][c - x] == color)
+				currConnected++;
+		
+		for (int x = 1; x <= right && (c + x) < COLS; ++x)
+			if (game->board[r][c + x] == color)
+				currConnected++;
+
+		connected += currConnected == 4;
+	}
+
+	return connected;
+}
+
+int calcDiagonally(Game* game, int c)
+{
+	int r = getRow(game, c);
+	char color = game->board[r][c];
+	int directions[4][2] = { {0, 3}, {1, 2}, {2, 1}, {3, 0} };
+
+	int connected = 0;
+
+	for (int i = 0; i < 4; ++i)
+	{
+		int left = directions[i][0], right = directions[i][1], currConnected = 1;
+
+		for (int x = 1; x <= left && (c - x) >= 0 && (r - x) >= 0; ++x)
+			if (game->board[r - x][c - x] == color)
+				currConnected++;
+
+		for (int x = 1; x <= right && (c + x) < COLS && (r + x) < ROWS; ++x)
+			if (game->board[r + x][c + x] == color)
+				currConnected++;
+
+		connected += currConnected == 4;
+	}
+
+	for (int i = 0; i < 4; ++i)
+	{
+		int left = directions[i][0], right = directions[i][1], currConnected = 1;
+
+		for (int x = 1; x <= left && (c - x) >= 0 && (r + x) < ROWS; ++x)
+			if (game->board[r + x][c - x] == color)
+				currConnected++;
+
+		for (int x = 1; x <= right && (c + x) < COLS && (r - x) >= 0; ++x)
+			if (game->board[r - x][c + x] == color)
+				currConnected++;
+
+		connected += currConnected == 4;
+	}
+
+	return connected;
 }

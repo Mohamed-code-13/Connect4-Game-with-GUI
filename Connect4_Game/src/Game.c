@@ -32,6 +32,9 @@ void runGame()
 					printf("row: %d  col: %d\n", row, col);
 
 					makeMove(&game, col);
+
+					printf("Score player1: %d\n", p1.score);
+					printf("Score player2: %d\n", p2.score);
 				}
 				else if (e.type == SDL_KEYDOWN)
 				{
