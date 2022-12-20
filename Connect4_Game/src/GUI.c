@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include "include/GUI.h"
 
 const char* pathsCirclesImages[] = { "./images/wC.png", "./images/rC.png", "./images/gC.png" };
@@ -37,6 +38,11 @@ bool init()
 					printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
 					success = false;
 				}
+				if (TTF_Init() == -1)
+				{
+					printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
+					success = false;
+				}
 			}
 		}
 	}
@@ -48,6 +54,10 @@ void loadMedia()
 {
 	for (int i = 0; i < Colors_TOTAL; ++i)
 		loadFromFile(&circles[i], pathsCirclesImages[i]);
+
+	gFont = TTF_OpenFont("acme.ttf", 28);
+
+	renderText();
 }
 
 void draw(Game* game)
@@ -56,13 +66,13 @@ void draw(Game* game)
 	SDL_RenderClear(gRenderer);
 	SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);
 
-	for (int i = 10; i < SCREEN_HEIGHT; i += CIRCLE_SIZE + 20)
+	for (int i = 60; i < SCREEN_HEIGHT - 50; i += CIRCLE_SIZE + 10)
 	{
-		for (int j = 10; j < SCREEN_WIDTH; j += CIRCLE_SIZE + 20)
+		for (int j = 10; j < SCREEN_WIDTH; j += CIRCLE_SIZE + 10)
 		{
 			enum Colors current;
 
-			switch (game->board[i / 100][j / 100])
+			switch (game->board[(i - 50) / 80][j / 80])
 			{
 			case 'r':
 				current = Colors_RED;
@@ -77,11 +87,16 @@ void draw(Game* game)
 
 			render(&circles[current], j, i);
 
-			SDL_RenderDrawLine(gRenderer, j - 10, 0, j - 10, SCREEN_HEIGHT);
+			SDL_RenderDrawLine(gRenderer, j - 10, 60, j - 10, SCREEN_HEIGHT - 50);
 		}
 
-		SDL_RenderDrawLine(gRenderer, 0, i - 10, SCREEN_WIDTH, i - 10);
+		SDL_RenderDrawLine(gRenderer, 0, i, SCREEN_WIDTH, i);
 	}
+
+	SDL_RenderDrawLine(gRenderer, 0, SCREEN_HEIGHT - 50, SCREEN_WIDTH, SCREEN_HEIGHT - 50);
+
+	render(&player_1_text, 20, (SCREEN_HEIGHT - 40));
+	render(&player_2_text, 20, 20);
 
 	SDL_RenderPresent(gRenderer);
 }
@@ -91,12 +106,16 @@ void close()
 	for (int i = 0; i < Colors_TOTAL; ++i)
 		freeTexture(&circles[i]);
 
+	TTF_CloseFont(gFont);
+	gFont = NULL;
+
 	SDL_DestroyRenderer(gRenderer);
 	SDL_DestroyWindow(gWindow);
 
 	gRenderer = NULL;
 	gWindow = NULL;
 
+	TTF_Quit();
 	IMG_Quit();
 	SDL_Quit();
 }
@@ -130,6 +149,38 @@ bool loadFromFile(Texture* texture, const char* path)
 	return texture->mTexture != NULL;
 }
 
+bool loadFromRenderedText(Texture* texture, const char* textureText, SDL_Color textColor)
+{
+	freeTexture(texture);
+
+	SDL_Surface* textSurface = TTF_RenderText_Solid(gFont, textureText, textColor);
+
+	if (textSurface == NULL)
+	{
+		printf("Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError());
+	}
+	else
+	{
+		//Create texture from surface pixels
+		texture->mTexture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
+		if (texture->mTexture == NULL)
+		{
+			printf("Unable to create texture from rendered text! SDL Error: %s\n", SDL_GetError());
+		}
+		else
+		{
+			//Get image dimensions
+			texture->mWidth = textSurface->w;
+			texture->mHeight = textSurface->h;
+		}
+
+		//Get rid of old surface
+		SDL_FreeSurface(textSurface);
+	}
+
+	return texture->mTexture != NULL;
+}
+
 void freeTexture(Texture* tex)
 {
 	if (tex->mTexture != NULL)
@@ -146,4 +197,35 @@ void render(Texture* tex, int x, int y)
 {
 	SDL_Rect rect = { x, y, tex->mWidth, tex->mHeight };
 	SDL_RenderCopy(gRenderer, tex->mTexture, NULL, &rect);
+}
+
+void getText(char* txt, Player* p)
+{
+	char sc[15];
+	sprintf(sc, "%d", p->score);
+
+	char c[7];
+	if (p->color == 'r')
+		strcpy(c, "RED");
+	else
+		strcpy(c, "GREEN");
+
+	strcpy(txt, c);
+	strcat(txt, " Player   Score: ");
+	strcat(txt, sc);
+}
+
+void renderText()
+{
+	char* p_text = (char*)malloc(50 * sizeof(char));
+
+	SDL_Color textColor = { 255, 0, 0 };
+	getText(p_text, &p1);
+	loadFromRenderedText(&player_1_text, p_text, textColor);
+
+	SDL_Color textColor2 = { 0, 255, 0 };
+	getText(p_text, &p2);
+	loadFromRenderedText(&player_2_text, p_text, textColor2);
+
+	free(p_text);
 }

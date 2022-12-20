@@ -35,12 +35,12 @@ void makeMove(Game* game, int col)
 			if (game->p1First)
 			{
 				game->board[i][col] = p1.color;
-				updateScore(game, &p1, col);
+				updateScore(game, &p1, col, 1);
 			}
 			else
 			{
 				game->board[i][col] = p2.color;
-				updateScore(game, &p2, col);
+				updateScore(game, &p2, col, 1);
 			}
 
 			flipPlayer(game);
@@ -48,6 +48,8 @@ void makeMove(Game* game, int col)
 			if (game->totalMoves < game->currMove || game->log[game->currMove] != col)
 				game->totalMoves = game->currMove + 1;
 			game->log[game->currMove++] = col;
+
+			endGame(game);
 
 			return;
 		}
@@ -60,6 +62,14 @@ void undoMove(Game* game)
 		return;
 
 	int c = game->log[--(game->currMove)];
+
+	flipPlayer(game);
+
+	if (game->p1First)
+		updateScore(game, &p1, c, -1);
+	else
+		updateScore(game, &p2, c, -1);
+
 	for (int i = 0; i < ROWS; ++i)
 	{
 		if (game->board[i][c] != '-')
@@ -68,7 +78,6 @@ void undoMove(Game* game)
 			break;
 		}
 	}
-	flipPlayer(game);
 }
 
 void redoMove(Game* game)
@@ -81,11 +90,11 @@ void redoMove(Game* game)
 	makeMove(game, c);
 }
 
-void updateScore(Game* game, Player* player, int c)
+void updateScore(Game* game, Player* player, int c, int increment)
 {
-	player->score += calcVertically(game, c);
-	player->score += calcHorizontally(game, c);
-	player->score += calcDiagonally(game, c);
+	player->score += calcVertically(game, c) * increment;
+	player->score += calcHorizontally(game, c) * increment;
+	player->score += calcDiagonally(game, c) * increment;
 }
 
 int getRow(Game* game, int c)
@@ -174,4 +183,18 @@ int calcDiagonally(Game* game, int c)
 	}
 
 	return connected;
+}
+
+void endGame(Game* game)
+{
+	if (game->currMove != ROWS * COLS)
+		return;
+
+	printf("The games has Ended!\n");
+	if (p1.score > p2.score)
+		printf("Player 1 won! Congratulations\n");
+	else if (p1.score < p2.score)
+		printf("Player 2 won! Congratulations\n");
+	else
+		printf("It's a Draw\n");
 }
