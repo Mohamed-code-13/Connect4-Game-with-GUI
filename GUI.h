@@ -47,12 +47,7 @@ TTF_Font* gFont;
 
 SDL_Surface *msurface ;
 SDL_Texture *mtexture ;
-SDL_Texture *stexture ;
-SDL_Texture *ltexture ;
-SDL_Texture *ttexture ;
-SDL_Texture *qtexture ;
-SDL_Texture *htexture ;
-SDL_Texture *ctexture ;
+
 
 
 Button StartButton;

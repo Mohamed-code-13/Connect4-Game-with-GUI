@@ -79,7 +79,7 @@ SDL_Color color= {232,234,11,255};
 void writeButton(Button *B)
 {
 
-    msurface = TTF_RenderText_Solid(gFont,B->label,color);//if(gFont==NULL){printf("lala");}
+    msurface = TTF_RenderText_Solid(gFont,B->label,color);
     B->mTexture = SDL_CreateTextureFromSurface(mRenderer,msurface);
     SDL_FreeSurface(msurface);
 
@@ -96,23 +96,14 @@ void createButtons()
     vsHumanButton.label=  "    VS HUMAN     ";
     vsCompButton.label=   "   VS COMPUTER   ";
 
-    msurface = TTF_RenderText_Solid(gFont,StartButton.label,color);
-    stexture = SDL_CreateTextureFromSurface(mRenderer,msurface);SDL_FreeSurface(msurface);
+    writeButton(&StartButton);
+    writeButton(&LoadButton);
+    writeButton(&TopScoreButton);
+    writeButton(&QuitButton);
 
-    msurface = TTF_RenderText_Solid(gFont,LoadButton.label,color);
-    ltexture = SDL_CreateTextureFromSurface(mRenderer,msurface);SDL_FreeSurface(msurface);
+    writeButton(&vsHumanButton);
+    writeButton(&vsCompButton);
 
-    msurface = TTF_RenderText_Solid(gFont,TopScoreButton.label,color);
-    ttexture = SDL_CreateTextureFromSurface(mRenderer,msurface);SDL_FreeSurface(msurface);
-
-    msurface = TTF_RenderText_Solid(gFont,QuitButton.label,color);
-    qtexture = SDL_CreateTextureFromSurface(mRenderer,msurface);SDL_FreeSurface(msurface);
-
-    msurface = TTF_RenderText_Solid(gFont,vsHumanButton.label,color);
-    htexture = SDL_CreateTextureFromSurface(mRenderer,msurface);SDL_FreeSurface(msurface);
-
-    msurface = TTF_RenderText_Solid(gFont,vsCompButton.label,color);
-    ctexture = SDL_CreateTextureFromSurface(mRenderer,msurface);SDL_FreeSurface(msurface);
 }
 
 void draw(Game* game)
@@ -173,13 +164,13 @@ void renderMainMenu()
 
 
 
-    SDL_RenderCopy(mRenderer,stexture,NULL, &rectStartNewGame);
+    SDL_RenderCopy(mRenderer,StartButton.mTexture,NULL, &rectStartNewGame);
 
-    SDL_RenderCopy(mRenderer,ltexture,NULL, &rectLoadGame);
+    SDL_RenderCopy(mRenderer,LoadButton.mTexture,NULL, &rectLoadGame);
 
-    SDL_RenderCopy(mRenderer,ttexture,NULL, &rectTopScore);
+    SDL_RenderCopy(mRenderer,TopScoreButton.mTexture,NULL, &rectTopScore);
 
-    SDL_RenderCopy(mRenderer,qtexture,NULL, &rectQuit);
+    SDL_RenderCopy(mRenderer,QuitButton.mTexture,NULL, &rectQuit);
 
     SDL_RenderPresent(mRenderer);
 }
@@ -191,10 +182,13 @@ void renderChooseMode()
     SDL_SetRenderDrawColor(mRenderer, 0xFF, 0x00, 0x00, 0xFF);
     SDL_Rect rectHuman = { 50, 50, 400, 100 };
     SDL_Rect rectComp = { 50, 200, 400, 100 };
+
     SDL_RenderFillRect(mRenderer,&rectHuman);
     SDL_RenderFillRect(mRenderer,&rectComp);
-    SDL_RenderCopy(mRenderer,htexture,NULL,&rectHuman);
-    SDL_RenderCopy(mRenderer,ctexture,NULL,&rectComp);
+
+    SDL_RenderCopy(mRenderer,vsHumanButton.mTexture,NULL,&rectHuman);
+    SDL_RenderCopy(mRenderer,vsCompButton.mTexture,NULL,&rectComp);
+
     SDL_RenderPresent(mRenderer);
 
 }
@@ -210,13 +204,23 @@ void close()
     SDL_DestroyRenderer(mRenderer);
     SDL_DestroyWindow(gWindow);
     SDL_DestroyWindow(mWindow);
+
     gRenderer = NULL;
     mRenderer = NULL;
     gWindow = NULL;
     mWindow = NULL;
+
     TTF_CloseFont(gFont);
     gFont = NULL;
+
     SDL_DestroyTexture(mtexture);
+    freeTexture(StartButton.mTexture);
+    freeTexture(LoadButton.mTexture);
+    freeTexture(TopScoreButton.mTexture);
+    freeTexture(QuitButton.mTexture);
+
+    freeTexture(vsHumanButton.mTexture);
+    freeTexture(vsCompButton.mTexture);
 
     TTF_Quit();
     IMG_Quit();
@@ -270,11 +274,5 @@ void render(Texture* tex, int x, int y)
     SDL_RenderCopy(gRenderer, tex->mTexture, NULL, &rect);
 
 }
-void renderButton(Texture* tex, int x, int y)
-{
-    SDL_Rect rect = { x, y, tex->mWidth, tex->mHeight };
 
-    SDL_RenderCopy(mRenderer, tex->mTexture, NULL, &rect);
-
-}
 
