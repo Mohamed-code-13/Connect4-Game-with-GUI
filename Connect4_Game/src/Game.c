@@ -4,12 +4,13 @@
 void runGame()
 {
 	Game game = createNewGame();
-
+	loadGame(&game);
+	
 	if (!init())
 		printf("Failed to initialize!\n");
 	else
 	{
-		loadMedia();
+		loadMedia(&game);
 		
 		bool quit = false;
 		SDL_Event e;
@@ -18,12 +19,15 @@ void runGame()
 		bool r = true;
 		while (!quit)
 		{
-			while (SDL_PollEvent(&e))
+			while (SDL_WaitEvent(&e))
 			{
 				if (e.type == SDL_QUIT)
+				{
 					quit = true;
+					break;
+				}
 
-				if (e.type == SDL_MOUSEBUTTONDOWN)
+				else if (e.type == SDL_MOUSEBUTTONDOWN)
 				{
 					SDL_GetMouseState(&x, &y);
 						
@@ -33,7 +37,7 @@ void runGame()
 
 					makeMove(&game, col);
 
-					renderText();
+					renderText(&game);
 
 					printf("Score player1: %d\n", p1.score);
 					printf("Score player2: %d\n", p2.score);
@@ -44,21 +48,21 @@ void runGame()
 					{
 					case SDLK_LEFT:
 						undoMove(&game);
-						renderText();
+						renderText(&game);
 						break;
 					case SDLK_RIGHT:
 						redoMove(&game);
-						renderText();
+						renderText(&game);
 						break;
 					default:
 						break;
 					}
 				}
-			}
 
-			draw(&game);
+				draw(&game);
+			}
 		}
 	}
 
-	close();
+	close(&game);
 }

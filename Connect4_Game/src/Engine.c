@@ -5,20 +5,29 @@ Player p1 = { 'r', 0 }, p2 = { 'g', 0 };
 Game createNewGame()
 {
 	Game game;
+
 	game.p1First = true;
 	game.currMove = 0;
 	game.totalMoves = 0;
+
+	game.board = (char**)malloc(ROWS * sizeof(char*));
+	game.log = (int*)malloc(ROWS * COLS * sizeof(int));
 	
 	initializeBoard(game.board);
 
 	return game;
 }
 
-void initializeBoard(char board[ROWS][COLS])
+
+void initializeBoard(char** board)
 {
 	for (int i = 0; i < ROWS; ++i)
+	{
+		board[i] = (char*)malloc(COLS * sizeof(char));
+
 		for (int j = 0; j < COLS; ++j)
 			board[i][j] = '-';
+	}
 }
 
 void flipPlayer(Game* game)

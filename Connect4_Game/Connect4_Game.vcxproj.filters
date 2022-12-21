@@ -27,6 +27,12 @@
     <ClCompile Include="src\GUI.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Configuration.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\save_load_game.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\include\Engine.h">
@@ -38,5 +44,14 @@
     <ClInclude Include="src\include\Game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\include\Configuration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\save_load_game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="acme.ttf" />
   </ItemGroup>
 </Project>

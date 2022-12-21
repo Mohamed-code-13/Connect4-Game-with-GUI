@@ -1,13 +1,9 @@
-#pragma once
 
-#include <stdio.h>
-#include <stdbool.h>
 #include <string.h>
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
-#include "include/Engine.h"
-
+#include "save_load_game.h"
 
 typedef struct
 {
@@ -39,9 +35,9 @@ void freeTexture(Texture* tex);
 void render(Texture* tex, int x, int y);
 
 bool init();
-void loadMedia();
+void loadMedia(Game* game);
 void draw(Game* game);
 void close();
-void getText(char* txt, Player* p);
-void renderText();
+void getText(char* txt, Player* p, bool p1First);
+void renderText(Game* game);
 

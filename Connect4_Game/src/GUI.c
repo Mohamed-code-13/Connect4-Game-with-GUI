@@ -50,14 +50,14 @@ bool init()
 	return success;
 }
 
-void loadMedia()
+void loadMedia(Game* game)
 {
 	for (int i = 0; i < Colors_TOTAL; ++i)
 		loadFromFile(&circles[i], pathsCirclesImages[i]);
 
-	gFont = TTF_OpenFont("acme.ttf", 28);
+	gFont = TTF_OpenFont("oswald.ttf", 28);
 
-	renderText();
+	renderText(game);
 }
 
 void draw(Game* game)
@@ -95,14 +95,21 @@ void draw(Game* game)
 
 	SDL_RenderDrawLine(gRenderer, 0, SCREEN_HEIGHT - 50, SCREEN_WIDTH, SCREEN_HEIGHT - 50);
 
-	render(&player_1_text, 20, (SCREEN_HEIGHT - 40));
-	render(&player_2_text, 20, 20);
+	render(&player_1_text, 20, (SCREEN_HEIGHT - 50));
+	render(&player_2_text, 20, 10);
 
 	SDL_RenderPresent(gRenderer);
 }
 
-void close()
+void close(Game* game)
 {
+	saveGame(game);
+
+	for (int i = 0; i < ROWS; ++i)
+		free(game->board[i]);
+	free(game->board);
+	free(game->log);
+
 	for (int i = 0; i < Colors_TOTAL; ++i)
 		freeTexture(&circles[i]);
 
@@ -199,7 +206,7 @@ void render(Texture* tex, int x, int y)
 	SDL_RenderCopy(gRenderer, tex->mTexture, NULL, &rect);
 }
 
-void getText(char* txt, Player* p)
+void getText(char* txt, Player* p, bool p1First)
 {
 	char sc[15];
 	sprintf(sc, "%d", p->score);
@@ -213,18 +220,21 @@ void getText(char* txt, Player* p)
 	strcpy(txt, c);
 	strcat(txt, " Player   Score: ");
 	strcat(txt, sc);
+	
+	if (p1First)
+		strcat(txt, "  (Your turn)");
 }
 
-void renderText()
+void renderText(Game* game)
 {
 	char* p_text = (char*)malloc(50 * sizeof(char));
 
 	SDL_Color textColor = { 255, 0, 0 };
-	getText(p_text, &p1);
+	getText(p_text, &p1, game->p1First);
 	loadFromRenderedText(&player_1_text, p_text, textColor);
 
 	SDL_Color textColor2 = { 0, 255, 0 };
-	getText(p_text, &p2);
+	getText(p_text, &p2, !game->p1First);
 	loadFromRenderedText(&player_2_text, p_text, textColor2);
 
 	free(p_text);

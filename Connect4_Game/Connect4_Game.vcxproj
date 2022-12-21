@@ -166,15 +166,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Configuration.c" />
     <ClCompile Include="src\Engine.c" />
     <ClCompile Include="src\Game.c" />
     <ClCompile Include="src\GUI.c" />
     <ClCompile Include="src\runApp.c" />
+    <ClCompile Include="src\save_load_game.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\include\Configuration.h" />
     <ClInclude Include="src\include\Engine.h" />
     <ClInclude Include="src\include\Game.h" />
     <ClInclude Include="src\include\GUI.h" />
+    <ClInclude Include="src\include\save_load_game.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="acme.ttf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

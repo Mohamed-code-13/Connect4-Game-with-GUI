@@ -1,19 +1,20 @@
-#pragma once
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#include "Configuration.h"
 
-#define ROWS 7
-#define COLS 9
+#define ROWS config.height
+#define COLS config.width
 #define SCREEN_WIDTH (COLS * 80)
 #define SCREEN_HEIGHT (ROWS * 80 + 100)
 #define CIRCLE_SIZE 70
 
 typedef struct
 {
-	char board[ROWS][COLS];
+	char** board;
 	bool p1First;
-
-	int log[ROWS * COLS];
+	
+	int* log;
 	int currMove, totalMoves;
 } Game;
 
@@ -27,7 +28,7 @@ Player p1, p2;
 
 Game createNewGame();
 
-void initializeBoard(char board[ROWS][COLS]);
+void initializeBoard(char** board);
 void makeMove(Game* game, int col);
 void undoMove(Game* game);
 void redoMove(Game* game);
