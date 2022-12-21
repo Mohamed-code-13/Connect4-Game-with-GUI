@@ -57,10 +57,19 @@ void loadMedia(Game* game)
 
 	gFont = TTF_OpenFont("oswald.ttf", 28);
 
-	renderText(game);
+	renderPlayerText(game);
+	renderMainMenuText();
 }
 
-void draw(Game* game)
+void draw(Game* game, enum State st)
+{
+	if (st == State_GamePlay)
+		drawGamePlay(game);
+	else if (st == State_MainMenu)
+		drawMainMenu(game);
+}
+
+void drawGamePlay(Game* game)
 {
 	SDL_SetRenderDrawColor(gRenderer, 0x3E, 0x3E, 0xFF, 0xFF);
 	SDL_RenderClear(gRenderer);
@@ -101,6 +110,26 @@ void draw(Game* game)
 	SDL_RenderPresent(gRenderer);
 }
 
+void drawMainMenu(Game* game)
+{
+	SDL_SetRenderDrawColor(gRenderer, 0, 0, 0xFF, 0xFF);
+	SDL_RenderClear(gRenderer);
+
+	SDL_SetRenderDrawColor(gRenderer, 0xCA, 0x2C, 0x40, 0xFF);
+	SDL_RenderFillRect(gRenderer, &buttons[0].rect);
+	render(&buttons[0].texture, buttons[0].rect.x + 40, buttons[0].rect.y);
+
+	SDL_SetRenderDrawColor(gRenderer, 0xFC, 0xB7, 0x50, 0xFF);
+	for (int i = 1; i < BUTTONS_Total; ++i)
+	{
+		SDL_RenderFillRect(gRenderer, &buttons[i].rect);
+
+		render(&buttons[i].texture, buttons[i].rect.x + 40, buttons[i].rect.y);
+	}
+
+	SDL_RenderPresent(gRenderer);
+}
+
 void close(Game* game)
 {
 	saveGame(game);
@@ -110,8 +139,14 @@ void close(Game* game)
 	free(game->board);
 	free(game->log);
 
+	freeTexture(&player_1_text);
+	freeTexture(&player_2_text);
+
 	for (int i = 0; i < Colors_TOTAL; ++i)
 		freeTexture(&circles[i]);
+
+	for (int i = 0; i < BUTTONS_Total; ++i)
+		freeTexture(&buttons[i]);
 
 	TTF_CloseFont(gFont);
 	gFont = NULL;
@@ -225,7 +260,7 @@ void getText(char* txt, Player* p, bool p1First)
 		strcat(txt, "  (Your turn)");
 }
 
-void renderText(Game* game)
+void renderPlayerText(Game* game)
 {
 	char* p_text = (char*)malloc(50 * sizeof(char));
 
@@ -238,4 +273,75 @@ void renderText(Game* game)
 	loadFromRenderedText(&player_2_text, p_text, textColor2);
 
 	free(p_text);
+}
+
+
+void renderMainMenuText()
+{
+	SDL_Color textColor = { 0x00, 0x00, 0x00 };
+
+	const char* opts[] = {"Welcome to Connect4 Game Main Menu", "New Game", "Load Game", "HighScore", "Quit"};
+
+	loadFromRenderedText(&buttons[0].texture, opts[0], textColor);
+	strcpy(buttons[0].name, opts[0]);
+
+	buttons[0].rect.x = SCREEN_WIDTH / 2 - 220;
+	buttons[0].rect.y = SCREEN_HEIGHT / 9.0;
+	buttons[0].rect.w = 480;
+	buttons[0].rect.h = 50;
+
+	for (int i = 1; i < 5; ++i)
+	{
+		loadFromRenderedText(&buttons[i].texture, opts[i], textColor);
+		strcpy(buttons[i].name, opts[i]);
+
+		buttons[i].rect.x = SCREEN_WIDTH / 2 - 80;
+		buttons[i].rect.y = SCREEN_HEIGHT * (i / 9.0 + 2 / 9.0);
+		buttons[i].rect.w = 200;
+		buttons[i].rect.h = 50;
+	}
+}
+
+void handleMouseGamePlay(Game* game, int x, int y)
+{
+	int row = (y - (CIRCLE_SIZE + 10)) / (CIRCLE_SIZE + 10), col = x / (CIRCLE_SIZE + 10);
+
+	printf("row: %d  col: %d\n", row, col);
+
+	makeMove(game, col);
+
+	renderPlayerText(game);
+	
+	printf("Score player1: %d\n", p1.score);
+	printf("Score player2: %d\n", p2.score);
+}
+
+void handleMouseMainMenu(int x, int y, bool* quit, enum State* currentState)
+{
+	for (int i = 1; i < BUTTONS_Total; ++i)
+	{
+		int x1 = buttons[i].rect.x, x2 = buttons[i].rect.x + buttons[i].rect.w;
+		int y1 = buttons[i].rect.y, y2 = buttons[i].rect.y + buttons[i].rect.h;
+
+		if (x1 <= x && x2 >= x && y1 <= y && y2 >= y)
+		{
+			switch (i)
+			{
+			case BUTTONS_newGame:
+				*currentState = State_GamePlay;
+				break;
+			case BUTTONS_loadGame:
+				printf("%s\n", buttons[i].name);
+				break;
+			case BUTTONS_highScore:
+				printf("%s\n", buttons[i].name);
+				break;
+			case BUTTONS_quit:
+				*quit = true;
+				break;
+			default:
+				break;
+			}
+		}
+	}
 }

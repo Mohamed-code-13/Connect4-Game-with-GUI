@@ -5,9 +5,9 @@
 
 #define ROWS config.height
 #define COLS config.width
-#define SCREEN_WIDTH (COLS * 80)
-#define SCREEN_HEIGHT (ROWS * 80 + 100)
 #define CIRCLE_SIZE 70
+#define SCREEN_WIDTH (COLS * (CIRCLE_SIZE + 10))
+#define SCREEN_HEIGHT (ROWS * (CIRCLE_SIZE + 10) + 100)
 
 typedef struct
 {
