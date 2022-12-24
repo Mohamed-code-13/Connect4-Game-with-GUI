@@ -132,24 +132,19 @@ int calcHorizontally(Game* game, int c)
 {
 	int r = getRow(game, c);
 	char color = game->board[r][c];
-	int directions[4][2] = { {0, 3}, {1, 2}, {2, 1}, {3, 0} };
+	int connected = 1;
 
-	int connected = 0;
-	for (int i = 0; i < 4; ++i)
-	{
-		int left = directions[i][0], right = directions[i][1], currConnected = 1;
-
-		for (int x = 1; x <= left && (c - x) >= 0; ++x)
+		for (int x = 1; x <= 3 && (c - x) >= 0; ++x)
 			if (game->board[r][c - x] == color)
-				currConnected++;
+				connected++;
+            else break;
 
-		for (int x = 1; x <= right && (c + x) < COLS; ++x)
+		for (int x = 1; x <= 3 && (c + x) < COLS; ++x)
 			if (game->board[r][c + x] == color)
-				currConnected++;
+				connected++;
+            else break;
 
-		connected += currConnected == 4;
-	}
-
+    connected = (connected-3) * (connected/4);
 	return connected;
 }
 
@@ -194,16 +189,46 @@ int calcDiagonally(Game* game, int c)
 	return connected;
 }
 
+void saveHighScore(Player* p)
+{
+
+  FILE* fptr = fopen("./Data/HighScores/highScores.txt", "a");
+
+  if (fptr == NULL)
+        return;
+
+  char sc[4];
+  sprintf(sc, "%d", p->score);
+
+  printf("Enter your name: ");
+
+  gets(p->name);
+
+  fputs(p->name, fptr);
+  fputc(' ', fptr);
+
+  fputs(sc, fptr);
+  fputc('\n', fptr);
+
+  fclose(fptr);
+}
+
 void endGame(Game* game)
 {
-	if (game->currMove != ROWS * COLS)
+	if (game->totalMoves != ROWS * COLS)
 		return;
 
 	printf("The games has Ended!\n");
 	if (p1.score > p2.score)
+    {
 		printf("Player 1 won! Congratulations\n");
+        saveHighScore(&p1);
+    }
 	else if (p1.score < p2.score)
+    {
 		printf("Player 2 won! Congratulations\n");
+        saveHighScore(&p2);
+    }
 	else
 		printf("It's a Draw\n");
 }

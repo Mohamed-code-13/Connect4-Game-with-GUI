@@ -50,6 +50,53 @@ bool init()
 	return success;
 }
 
+void render(Texture* tex, int x, int y)
+{
+	SDL_Rect rect = { x, y, tex->mWidth, tex->mHeight };
+	SDL_RenderCopy(gRenderer, tex->mTexture, NULL, &rect);
+}
+
+void freeTexture(Texture* tex)
+{
+	if (tex->mTexture != NULL)
+	{
+		SDL_DestroyTexture(tex->mTexture);
+
+		tex->mTexture = NULL;
+		tex->mHeight = 0;
+		tex->mWidth = 0;
+	}
+}
+
+bool loadFromFile(Texture* texture, const char* path)
+{
+	freeTexture(texture);
+
+	SDL_Texture* newTexture = NULL;
+	SDL_Surface* loadSurface = IMG_Load(path);
+
+	if (loadSurface == NULL)
+		printf("Unable to load image %s! SDL_image Error: %s\n", path, IMG_GetError());
+	else
+	{
+		SDL_SetColorKey(loadSurface, SDL_TRUE, SDL_MapRGB(loadSurface->format, 0x00, 0x00, 0x00));
+
+		newTexture = SDL_CreateTextureFromSurface(gRenderer, loadSurface);
+		if (newTexture == NULL)
+			printf("Unable to create texture from %s! SDL Error: %s\n", path, SDL_GetError());
+		else
+		{
+			texture->mHeight = loadSurface->h;
+			texture->mWidth = loadSurface->w;
+		}
+
+		SDL_FreeSurface(loadSurface);
+	}
+
+	texture->mTexture = newTexture;
+	return texture->mTexture != NULL;
+}
+
 void loadMedia(Game* game)
 {
 	for (int i = 0; i < Colors_TOTAL; ++i)
@@ -58,21 +105,11 @@ void loadMedia(Game* game)
 	gFont = TTF_OpenFont("acme.ttf", 28);
 
 	renderPlayerText(game);
-	renderMainMenuText();
-}
-
-void draw(Game* game, enum State st)
-{
-	if (st == State_GamePlay)
-		drawGamePlay(game);
-	else if (st == State_MainMenu)
-		drawMainMenu(game);
+	renderText();
 }
 
 void drawGamePlay(Game* game)
 {
-	SDL_SetRenderDrawColor(gRenderer, 0x3E, 0x3E, 0xFF, 0xFF);
-	SDL_RenderClear(gRenderer);
 	SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);
 
 	for (int i = 60; i < SCREEN_HEIGHT - 50; i += CIRCLE_SIZE + 10)
@@ -110,17 +147,14 @@ void drawGamePlay(Game* game)
 	SDL_RenderPresent(gRenderer);
 }
 
-void drawMainMenu(Game* game)
+void drawMainMenu()
 {
-	SDL_SetRenderDrawColor(gRenderer, 0, 0, 0xFF, 0xFF);
-	SDL_RenderClear(gRenderer);
-
 	SDL_SetRenderDrawColor(gRenderer, 0xCA, 0x2C, 0x40, 0xFF);
 	SDL_RenderFillRect(gRenderer, &buttons[0].rect);
 	render(&buttons[0].texture, buttons[0].rect.x + 40, buttons[0].rect.y);
 
 	SDL_SetRenderDrawColor(gRenderer, 0xFC, 0xB7, 0x50, 0xFF);
-	for (int i = 1; i < BUTTONS_Total; ++i)
+	for (int i = 1; i < BUTTONS_TotalMainMenu; ++i)
 	{
 		SDL_RenderFillRect(gRenderer, &buttons[i].rect);
 
@@ -130,66 +164,72 @@ void drawMainMenu(Game* game)
 	SDL_RenderPresent(gRenderer);
 }
 
-void close(Game* game)
+void drawModeOptions()
 {
-
-
-	for (int i = 0; i < ROWS; ++i)
-		free(game->board[i]);
-	free(game->board);
-	free(game->log);
-
-	freeTexture(&player_1_text);
-	freeTexture(&player_2_text);
-
-	for (int i = 0; i < Colors_TOTAL; ++i)
-		freeTexture(&circles[i]);
-
-	for (int i = 0; i < BUTTONS_Total; ++i)
-		freeTexture(&buttons[i]);
-
-	TTF_CloseFont(gFont);
-	gFont = NULL;
-
-	SDL_DestroyRenderer(gRenderer);
-	SDL_DestroyWindow(gWindow);
-
-	gRenderer = NULL;
-	gWindow = NULL;
-
-	TTF_Quit();
-	IMG_Quit();
-	SDL_Quit();
-}
-
-bool loadFromFile(Texture* texture, const char* path)
-{
-	freeTexture(texture);
-
-	SDL_Texture* newTexture = NULL;
-	SDL_Surface* loadSurface = IMG_Load(path);
-
-	if (loadSurface == NULL)
-		printf("Unable to load image %s! SDL_image Error: %s\n", path, IMG_GetError());
-	else
+	SDL_SetRenderDrawColor(gRenderer, 0xFC, 0xB7, 0x50, 0xFF);
+	for (int i = BUTTONS_HvH; i < BUTTONS_TotalMode; ++i)
 	{
-		SDL_SetColorKey(loadSurface, SDL_TRUE, SDL_MapRGB(loadSurface->format, 0x00, 0x00, 0x00));
+		SDL_RenderFillRect(gRenderer, &buttons[i].rect);
 
-		newTexture = SDL_CreateTextureFromSurface(gRenderer, loadSurface);
-		if (newTexture == NULL)
-			printf("Unable to create texture from %s! SDL Error: %s\n", path, SDL_GetError());
-		else
-		{
-			texture->mHeight = loadSurface->h;
-			texture->mWidth = loadSurface->w;
-		}
-
-		SDL_FreeSurface(loadSurface);
+		render(&buttons[i].texture, buttons[i].rect.x + 40, buttons[i].rect.y);
 	}
 
-	texture->mTexture = newTexture;
-	return texture->mTexture != NULL;
+	SDL_RenderPresent(gRenderer);
 }
+
+void drawLoadGame()
+{
+	SDL_SetRenderDrawColor(gRenderer, 0xFC, 0xB7, 0x50, 0xFF);
+	for (int i = BUTTONS_game1; i < BUTTONS_TOTAL; ++i)
+	{
+		SDL_RenderFillRect(gRenderer, &buttons[i].rect);
+
+		render(&buttons[i].texture, buttons[i].rect.x + 40, buttons[i].rect.y);
+	}
+
+	SDL_RenderPresent(gRenderer);
+}
+
+void drawHighScores()
+{
+    SDL_SetRenderDrawColor(gRenderer, 0xFC, 0xB7, 0x50, 0xFF);
+    for (int i = 0; i < numOfScores; ++i)
+    {
+        SDL_RenderFillRect(gRenderer, &((highScores + i)->rect));
+
+        render(&((highScores + i)->texture), (highScores+i)->rect.x + 40, (highScores + i)->rect.y);
+    }
+
+    SDL_RenderPresent(gRenderer);
+}
+
+void draw(Game* game, enum State st)
+{
+	SDL_SetRenderDrawColor(gRenderer, 0x3E, 0x3E, 0xFF, 0xFF);
+	SDL_RenderClear(gRenderer);
+
+	switch (st)
+	{
+	case State_GamePlay:
+		drawGamePlay(game);
+		break;
+	case State_MainMenu:
+		drawMainMenu();
+		break;
+	case State_ModeOptions:
+		drawModeOptions();
+		break;
+	case State_LoadGame:
+		drawLoadGame();
+		break;
+    case State_HighScore:
+        drawHighScores();
+        break;
+	default:
+		break;
+	}
+}
+
 
 bool loadFromRenderedText(Texture* texture, const char* textureText, SDL_Color textColor)
 {
@@ -223,24 +263,6 @@ bool loadFromRenderedText(Texture* texture, const char* textureText, SDL_Color t
 	return texture->mTexture != NULL;
 }
 
-void freeTexture(Texture* tex)
-{
-	if (tex->mTexture != NULL)
-	{
-		SDL_DestroyTexture(tex->mTexture);
-
-		tex->mTexture = NULL;
-		tex->mHeight = 0;
-		tex->mWidth = 0;
-	}
-}
-
-void render(Texture* tex, int x, int y)
-{
-	SDL_Rect rect = { x, y, tex->mWidth, tex->mHeight };
-	SDL_RenderCopy(gRenderer, tex->mTexture, NULL, &rect);
-}
-
 void getText(char* txt, Player* p, bool p1First)
 {
 	char sc[15];
@@ -269,18 +291,15 @@ void renderPlayerText(Game* game)
 	loadFromRenderedText(&player_1_text, p_text, textColor);
 
 	SDL_Color textColor2 = { 0, 255, 0 };
-	getText(p_text, &p2, !game->p1First);
+	getText(p_text, &p2, !(game->p1First));
 	loadFromRenderedText(&player_2_text, p_text, textColor2);
 
 	free(p_text);
 }
 
-
-void renderMainMenuText()
+void mainMenuText(const char* opts[])
 {
 	SDL_Color textColor = { 0x00, 0x00, 0x00 };
-
-	const char* opts[] = {"Welcome to Connect4 Game Main Menu", "New Game", "Load Game", "HighScore", "Quit"};
 
 	loadFromRenderedText(&buttons[0].texture, opts[0], textColor);
 	strcpy(buttons[0].name, opts[0]);
@@ -290,7 +309,7 @@ void renderMainMenuText()
 	buttons[0].rect.w = 480;
 	buttons[0].rect.h = 50;
 
-	for (int i = 1; i < 5; ++i)
+	for (int i = BUTTONS_newGame; i < BUTTONS_TotalMainMenu; ++i)
 	{
 		loadFromRenderedText(&buttons[i].texture, opts[i], textColor);
 		strcpy(buttons[i].name, opts[i]);
@@ -302,46 +321,100 @@ void renderMainMenuText()
 	}
 }
 
-void handleMouseGamePlay(Game* game, int x, int y)
+void modeOptionsText(const char* opts[])
 {
-	int row = (y - (CIRCLE_SIZE + 10)) / (CIRCLE_SIZE + 10), col = x / (CIRCLE_SIZE + 10);
+	SDL_Color textColor = { 0x00, 0x00, 0x00 };
 
-	printf("row: %d  col: %d\n", row, col);
+	for (int i = BUTTONS_HvH; i < BUTTONS_TotalMode; ++i)
+	{
+		loadFromRenderedText(&buttons[i].texture, opts[i], textColor);
+		strcpy(buttons[i].name, opts[i]);
 
-	makeMove(game, col);
-
-	renderPlayerText(game);
-
-	printf("Score player1: %d\n", p1.score);
-	printf("Score player2: %d\n", p2.score);
+		buttons[i].rect.x = SCREEN_WIDTH / 2 - 130;
+		buttons[i].rect.y = SCREEN_HEIGHT * ((i - 1) / 9.0);
+		buttons[i].rect.w = 280;
+		buttons[i].rect.h = 50;
+	}
 }
 
-void handleMouseMainMenu(int x, int y, bool* quit, enum State* currentState)
+void loadGameText(const char* opts[])
 {
-	for (int i = 1; i < BUTTONS_Total; ++i)
-	{
-		int x1 = buttons[i].rect.x, x2 = buttons[i].rect.x + buttons[i].rect.w;
-		int y1 = buttons[i].rect.y, y2 = buttons[i].rect.y + buttons[i].rect.h;
+	SDL_Color textColor = { 0x00, 0x00, 0x00 };
 
-		if (x1 <= x && x2 >= x && y1 <= y && y2 >= y)
-		{
-			switch (i)
-			{
-			case BUTTONS_newGame:
-				*currentState = State_GamePlay;
-				break;
-			case BUTTONS_loadGame:
-				printf("%s\n", buttons[i].name);
-				break;
-			case BUTTONS_highScore:
-				printf("%s\n", buttons[i].name);
-				break;
-			case BUTTONS_quit:
-				*quit = true;
-				break;
-			default:
-				break;
-			}
-		}
+	for (int i = BUTTONS_game1; i < BUTTONS_TOTAL; ++i)
+	{
+		loadFromRenderedText(&buttons[i].texture, opts[i], textColor);
+		strcpy(buttons[i].name, opts[i]);
+
+		buttons[i].rect.x = SCREEN_WIDTH / 2 - 120;
+		buttons[i].rect.y = SCREEN_HEIGHT * ((i - 4) / 9.0);
+		buttons[i].rect.w = 250;
+		buttons[i].rect.h = 50;
 	}
+}
+
+void highScoreText()
+{
+    char names[SCORES][50];
+    int numOfScores = getHighScores(names, SCORES);
+
+    highScores = (Button*)malloc(numOfScores * sizeof(Button));
+
+    SDL_Color textColor = {0x00, 0x00, 0x00};
+
+    for (int i = 0; i < numOfScores; ++i)
+    {
+        loadFromRenderedText(&((highScores )->texture), names[i], textColor);
+        strcpy((highScores + i)->name, names[i]);
+
+        highScores[i].rect.x = 30;
+        highScores[i].rect.y = SCREEN_HEIGHT * (i / 10 + 1/10);
+        highScores[i].rect.w = 250;
+        highScores[i].rect.h = 50;
+    }
+}
+
+void renderText()
+{
+	const char* opts[] = {"Welcome to Connect4 Game Main Menu", "New Game", "Load Game", "HighScore", "Quit",
+							"Human vs Human", "Human vs Computer", "Game 1 (Latest)", "Game 2", "Game 3 (Oldest)"};
+
+	mainMenuText(opts);
+	modeOptionsText(opts);
+	loadGameText(opts);
+	highScoreText();
+}
+
+void close(Game* game)
+{
+	saveGame(game);
+
+	for (int i = 0; i < ROWS; ++i)
+		free(game->board[i]);
+	free(game->board);
+	free(game->log);
+
+    free(highScores);
+
+	freeTexture(&player_1_text);
+	freeTexture(&player_2_text);
+
+	for (int i = 0; i < Colors_TOTAL; ++i)
+		freeTexture(&circles[i]);
+
+	for (int i = 0; i < BUTTONS_TOTAL; ++i)
+		freeTexture(&buttons[i]);
+
+	TTF_CloseFont(gFont);
+	gFont = NULL;
+
+	SDL_DestroyRenderer(gRenderer);
+	SDL_DestroyWindow(gWindow);
+
+	gRenderer = NULL;
+	gWindow = NULL;
+
+	TTF_Quit();
+	IMG_Quit();
+	SDL_Quit();
 }
