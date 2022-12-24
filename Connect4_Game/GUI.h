@@ -1,9 +1,8 @@
-
-#include <string.h>
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 #include "save_load_game.h"
+#include "high_score.h"
 
 typedef struct
 {
@@ -32,6 +31,9 @@ enum State
 {
 	State_GamePlay,
 	State_MainMenu,
+	State_ModeOptions,
+	State_LoadGame,
+	State_HighScore,
 	State_Total
 };
 
@@ -42,31 +44,30 @@ enum BUTTONS
 	BUTTONS_loadGame,
 	BUTTONS_highScore,
 	BUTTONS_quit,
-	BUTTONS_Total
+	BUTTONS_HvH,
+	BUTTONS_HvC,
+	BUTTONS_game1,
+	BUTTONS_game2,
+	BUTTONS_game3,
+	BUTTONS_TOTAL,
+	BUTTONS_TotalMainMenu = 5,
+	BUTTONS_TotalMode = 7,
 };
 
 Texture circles[Colors_TOTAL];
 Texture player_1_text, player_2_text;
-Button buttons[BUTTONS_Total];
+Button buttons[BUTTONS_TOTAL];
+Button* highScores;
 
 SDL_Window* gWindow;
 SDL_Renderer* gRenderer;
 TTF_Font* gFont;
 
-
-bool loadFromFile(Texture* texture, const char* path);
-bool loadFromRenderedText(Texture* texture, const char* textureText, SDL_Color textColor);
-void freeTexture(Texture* tex);
-void render(Texture* tex, int x, int y);
-void renderPlayerText(Game* game);
-void renderMainMenuText();
-void getText(char* txt, Player* p, bool p1First);
+int numOfScores;
 
 bool init();
 void loadMedia(Game* game);
 void draw(Game* game, enum State st);
-void drawGamePlay(Game* game);
-void drawMainMenu(Game* game);
+void renderText();
+void renderPlayerText(Game* game);
 void close(Game* game);
-void handleMouseGamePlay(Game* game, int x, int y);
-void handleMouseMainMenu(int x, int y, bool* quit, enum State* currentState);
