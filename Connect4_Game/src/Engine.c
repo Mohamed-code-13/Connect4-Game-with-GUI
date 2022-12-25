@@ -7,6 +7,7 @@ Game createNewGame()
 	Game game;
 
 	game.p1First = true;
+	game.ai = false;
 	game.currMove = 0;
 	game.totalMoves = 0;
 
@@ -65,6 +66,9 @@ void makeMove(Game* game, int col)
 			if (game->totalMoves < game->currMove || game->log[game->currMove] != col)
 				game->totalMoves = game->currMove + 1;
 			game->log[game->currMove++] = col;
+
+			if (game->ai && !game->p1First)
+				makeMove(game, getCol(game->board, ROWS, COLS, col));
 
 			return;
 		}

@@ -38,7 +38,7 @@ int getHighScores(char** names, int h)
 	}
 
 	int i = 0;
-	while (fgets(names[i], 49, fptr) && i < h)
+	while (i < h && fgets(names[i], 49, fptr))
 		names[i++][strlen(names[i]) - 1] = 0;
 
 	fclose(fptr);

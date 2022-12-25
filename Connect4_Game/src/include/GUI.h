@@ -41,6 +41,7 @@ enum BUTTONS
 {
 	BUTTONS_CONNECT4,
 	BUTTONS_newGame,
+	BUTTONS_resume,
 	BUTTONS_loadGame,
 	BUTTONS_highScore,
 	BUTTONS_quit,
@@ -50,8 +51,9 @@ enum BUTTONS
 	BUTTONS_game2,
 	BUTTONS_game3,
 	BUTTONS_TOTAL,
-	BUTTONS_TotalMainMenu = 5,
-	BUTTONS_TotalMode = 7,
+	BUTTONS_TotalMainMenu = 6,
+	BUTTONS_TotalMode = 8,
+	BUTTONS_TotalSavedGames = 11,
 };
 
 Texture circles[Colors_TOTAL];

@@ -138,6 +138,9 @@ void handleMouseMainMenu(int x, int y, bool* quit, enum State* currentState)
 			case BUTTONS_newGame:
 				*currentState = State_ModeOptions;
 				break;
+			case BUTTONS_resume:
+				*currentState = State_GamePlay;
+				break;
 			case BUTTONS_loadGame:
 				*currentState = State_LoadGame;
 				break;
@@ -170,7 +173,8 @@ void handleMouseModeOptions(int x, int y, Game* game, enum State* currentState)
 				*game = createNewGame();
 				break;
 			case BUTTONS_HvC:
-				printf("%s\n", buttons[i].name);
+				game->ai = true;
+				*currentState = State_GamePlay;
 				break;
 			default:
 				break;

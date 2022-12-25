@@ -4,6 +4,7 @@
 #include <string.h>
 #include "Configuration.h"
 #include "high_score.h"
+#include "ai.h"
 
 #define ROWS config.height
 #define COLS config.width
@@ -16,7 +17,8 @@ typedef struct
 {
 	char** board;
 	bool p1First;
-	
+	bool ai;
+
 	int* log;
 	int currMove, totalMoves;
 

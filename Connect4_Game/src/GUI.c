@@ -351,7 +351,7 @@ void modeOptionsText(const char* opts[])
 		strcpy(buttons[i].name, opts[i]);
 
 		buttons[i].rect.x = SCREEN_WIDTH / 2 - 130;
-		buttons[i].rect.y = SCREEN_HEIGHT * ((i - 1) / 9.0);
+		buttons[i].rect.y = SCREEN_HEIGHT * ((i - 2) / 9.0);
 		buttons[i].rect.w = 280;
 		buttons[i].rect.h = 50;
 	}
@@ -367,7 +367,7 @@ void loadGameText(const char* opts[])
 		strcpy(buttons[i].name, opts[i]);
 
 		buttons[i].rect.x = SCREEN_WIDTH / 2 - 120;
-		buttons[i].rect.y = SCREEN_HEIGHT * ((i - 4) / 9.0);
+		buttons[i].rect.y = SCREEN_HEIGHT * ((i - 5) / 9.0);
 		buttons[i].rect.w = 250;
 		buttons[i].rect.h = 50;
 	}
@@ -409,19 +409,6 @@ void highScoreText()
 	for (int i = 0; i < SCORES; ++i)
 		free(names[i]);
 	free(names);
-
-	const char* opts[] = { "Enter your Name (max 50): "};
-
-
-	loadFromRenderedText(&gameEnd[0].texture, opts[0], textColor);
-	strcpy(gameEnd[0].name, opts[0]);
-
-	gameEnd[0].rect.x = SCREEN_WIDTH / 2 - 160;
-	gameEnd[0].rect.y = SCREEN_HEIGHT / 9;
-	gameEnd[0].rect.w = 350;
-	gameEnd[0].rect.h = 50;
-
-	gameEnd[1].name[0] = ' ';
 }
 
 void endGameText(Player* p)
@@ -433,13 +420,26 @@ void endGameText(Player* p)
 	gameEnd[1].rect.y = SCREEN_HEIGHT / 2;
 	gameEnd[1].rect.w = 500;
 	gameEnd[1].rect.h = 50;
-
 }
 
 void renderText()
 {
-	const char* opts[] = {"Welcome to Connect4 Game Main Menu", "New Game", "Load Game", "HighScore", "Quit",
+	SDL_Color textColor = { 0x00, 0x00, 0x00 };
+
+	const char* opts[] = {"Welcome to Connect4 Game Main Menu", "New Game", "Resume", "Load Game", "HighScore", "Quit",
 							"Human vs Human", "Human vs Computer", "Game 1 (Latest)", "Game 2", "Game 3 (Oldest)"};
+
+	const char* end[] = { "Enter your Name (max 50): " };
+
+	loadFromRenderedText(&gameEnd[0].texture, end[0], textColor);
+	strcpy(gameEnd[0].name, end[0]);
+
+	gameEnd[0].rect.x = SCREEN_WIDTH / 2 - 160;
+	gameEnd[0].rect.y = SCREEN_HEIGHT / 9;
+	gameEnd[0].rect.w = 350;
+	gameEnd[0].rect.h = 50;
+
+	gameEnd[1].name[0] = ' ';
 
 	mainMenuText(opts);
 	modeOptionsText(opts);
@@ -450,7 +450,7 @@ void renderText()
 
 void close(Game* game)
 {
-	if (!game->gameEnded)
+	if (!game->gameEnded && game->totalMoves != 0)
 		saveGame(game);
 
 	for (int i = 0; i < ROWS; ++i)
