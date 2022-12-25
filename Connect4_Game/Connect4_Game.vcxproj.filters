@@ -33,6 +33,9 @@
     <ClCompile Include="src\save_load_game.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\high_score.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\include\Engine.h">
@@ -48,6 +51,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\include\save_load_game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\high_score.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

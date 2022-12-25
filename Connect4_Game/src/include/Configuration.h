@@ -1,6 +1,6 @@
 #pragma once
 
-typedef struct
+typedef struct Configu
 {
 	int height;
 	int width;

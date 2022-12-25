@@ -1,3 +1,5 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include "include/Game.h"
 
 
@@ -13,7 +15,7 @@ void runGame()
 	{
 		loadMedia(&game);
 		
-		bool quit = false;
+		bool quit = false, typing = false;
 		SDL_Event e;
 
 		int x, y;
@@ -40,7 +42,7 @@ void runGame()
 						handleMouseMainMenu(x, y, &quit, &currentState);
 						break;
 					case State_ModeOptions:
-						handleMouseModeOptions(x, y, &currentState);
+						handleMouseModeOptions(x, y, &game, &currentState);
 						break;
 					case State_LoadGame:
 						handleMouseLoadGame(x, y, &game, &currentState);
@@ -65,13 +67,42 @@ void runGame()
 							break;
 						case SDLK_ESCAPE:
 							currentState = State_MainMenu;
+							break;
+						default:
+							break;
+						}
+					}
+					else
+					{
+						switch (e.key.keysym.sym)
+						{
+						case SDLK_ESCAPE:
+							currentState = State_MainMenu;
+							break;
+						case SDLK_SPACE:
+							currentState = State_WinnerName;
+							typing = true;
+							break;
 						default:
 							break;
 						}
 					}
 				}
+				
+
+				int winner = endGame(&game);
+				if (winner && !game.gameEnded)
+				{
+					currentState = State_WinnerName;
+					typing = true;
+				}
 
 				draw(&game, currentState);
+
+				if (winner == 1)
+					handleTyping(&e, &typing, &p1, &game, &currentState);
+				else if (winner == 2)
+					handleTyping(&e, &typing, &p2, &game, &currentState);
 			}
 		}
 	}
@@ -111,7 +142,7 @@ void handleMouseMainMenu(int x, int y, bool* quit, enum State* currentState)
 				*currentState = State_LoadGame;
 				break;
 			case BUTTONS_highScore:
-				printf("%s\n", buttons[i].name);
+				*currentState = State_HighScore;
 				break;
 			case BUTTONS_quit:
 				*quit = true;
@@ -123,7 +154,7 @@ void handleMouseMainMenu(int x, int y, bool* quit, enum State* currentState)
 	}
 }
 
-void handleMouseModeOptions(int x, int y, enum State* currentState)
+void handleMouseModeOptions(int x, int y, Game* game, enum State* currentState)
 {
 	for (int i = BUTTONS_HvH; i < BUTTONS_TotalMode; ++i)
 	{
@@ -136,6 +167,7 @@ void handleMouseModeOptions(int x, int y, enum State* currentState)
 			{
 			case BUTTONS_HvH:
 				*currentState = State_GamePlay;
+				*game = createNewGame();
 				break;
 			case BUTTONS_HvC:
 				printf("%s\n", buttons[i].name);
@@ -175,4 +207,50 @@ void handleMouseLoadGame(int x, int y, Game* game, enum State* currentState)
 			}
 		}
 	}
+}
+
+void handleTyping(SDL_Event* e, bool* typing, Player* winner, Game* game, enum State* currentState)
+{
+	SDL_StartTextInput();
+	while (*typing)
+	{
+		while (SDL_WaitEvent(e))
+		{
+			if (e->type == SDL_QUIT)
+			{
+				*typing = false;
+				*currentState = State_MainMenu;
+				break;
+			}
+
+			if (e->type == SDL_TEXTINPUT || e->type == SDL_KEYDOWN)
+			{
+				if (e->key.keysym.sym == SDLK_RETURN)
+				{
+					*typing = false;
+					*currentState = State_MainMenu;
+					break;
+				}
+				
+				if (e->type == SDL_KEYDOWN && e->key.keysym.sym == SDLK_BACKSPACE && strlen(winner->name) > 1)
+					winner->name[strlen(winner->name) - 1] = 0;
+
+				else if (e->type == SDL_TEXTINPUT)
+				{
+					strcat(winner->name, e->text.text);
+				}
+				printf("%s\n", winner->name);
+
+				endGameText(winner);
+				draw(game, *currentState);
+
+			}
+		}
+	}
+
+	SDL_StopTextInput();
+	saveHighScore(winner->name, winner->score);
+	highScoreText();
+	game->gameEnded = true;
+	// *game = createNewGame();
 }

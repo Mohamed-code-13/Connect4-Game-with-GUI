@@ -32,6 +32,8 @@ enum State
 	State_MainMenu,
 	State_ModeOptions,
 	State_LoadGame,
+	State_HighScore,
+	State_WinnerName,
 	State_Total
 };
 
@@ -55,6 +57,10 @@ enum BUTTONS
 Texture circles[Colors_TOTAL];
 Texture player_1_text, player_2_text;
 Button buttons[BUTTONS_TOTAL];
+Button gameEnd[2];
+
+Button scores[200];
+int numOfScores;
 
 SDL_Window* gWindow;
 SDL_Renderer* gRenderer;
@@ -67,3 +73,5 @@ void draw(Game* game, enum State st);
 void renderText();
 void renderPlayerText(Game* game);
 void close(Game* game);
+void endGameText(Player* p);
+void highScoreText();

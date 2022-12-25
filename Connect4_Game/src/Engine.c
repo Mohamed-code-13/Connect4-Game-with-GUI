@@ -12,8 +12,16 @@ Game createNewGame()
 
 	game.board = (char**)malloc(ROWS * sizeof(char*));
 	game.log = (int*)malloc(ROWS * COLS * sizeof(int));
+	game.gameEnded = false;
 	
 	initializeBoard(game.board);
+
+	p1.score = 0;
+	p2.score = 0;
+	p1.name[0] = ' ';
+	p2.name[0] = ' ';
+	p1.name[1] = '\0';
+	p2.name[1] = '\0';
 
 	return game;
 }
@@ -57,8 +65,6 @@ void makeMove(Game* game, int col)
 			if (game->totalMoves < game->currMove || game->log[game->currMove] != col)
 				game->totalMoves = game->currMove + 1;
 			game->log[game->currMove++] = col;
-
-			endGame(game);
 
 			return;
 		}
@@ -194,16 +200,28 @@ int calcDiagonally(Game* game, int c)
 	return connected;
 }
 
-void endGame(Game* game)
+int endGame(Game* game)
 {
+	if (game->gameEnded)
+		return 4;
+
 	if (game->currMove != ROWS * COLS)
-		return;
+		return 0;
 
 	printf("The games has Ended!\n");
 	if (p1.score > p2.score)
+	{
 		printf("Player 1 won! Congratulations\n");
+		return 1;
+	}
 	else if (p1.score < p2.score)
+	{
 		printf("Player 2 won! Congratulations\n");
+		return 2;
+	}
 	else
+	{
 		printf("It's a Draw\n");
+		return 3;
+	}
 }

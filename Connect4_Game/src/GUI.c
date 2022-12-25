@@ -147,7 +147,7 @@ void drawGamePlay(Game* game)
 	SDL_RenderPresent(gRenderer);
 }
 
-void drawMainMenu(Game* game)
+void drawMainMenu()
 {
 	SDL_SetRenderDrawColor(gRenderer, 0xCA, 0x2C, 0x40, 0xFF);
 	SDL_RenderFillRect(gRenderer, &buttons[0].rect);
@@ -164,7 +164,7 @@ void drawMainMenu(Game* game)
 	SDL_RenderPresent(gRenderer);
 }
 
-void drawModeOptions(Game* game)
+void drawModeOptions()
 {
 	SDL_SetRenderDrawColor(gRenderer, 0xFC, 0xB7, 0x50, 0xFF);
 	for (int i = BUTTONS_HvH; i < BUTTONS_TotalMode; ++i)
@@ -177,7 +177,7 @@ void drawModeOptions(Game* game)
 	SDL_RenderPresent(gRenderer);
 }
 
-void drawLoadGame(Game* game)
+void drawLoadGame()
 {
 	SDL_SetRenderDrawColor(gRenderer, 0xFC, 0xB7, 0x50, 0xFF);
 	for (int i = BUTTONS_game1; i < BUTTONS_TOTAL; ++i)
@@ -188,6 +188,36 @@ void drawLoadGame(Game* game)
 	}
 
 	SDL_RenderPresent(gRenderer);
+}
+
+void drawHighScore()
+{
+	SDL_SetRenderDrawColor(gRenderer, 0xFF, 0x00, 0x00, 0xFF);
+	for (int i = 0; i < numOfScores; ++i)
+	{
+
+		SDL_RenderFillRect(gRenderer, &(scores[i].rect));
+
+		render(&(scores[i].texture), scores[i].rect.x + 40, scores[i].rect.y);
+	}
+
+	SDL_RenderPresent(gRenderer);
+}
+
+void drawWinnerName()
+{
+	SDL_SetRenderDrawColor(gRenderer, 0x66, 0xF9, 0x5B, 0xFF);
+
+	for (int i = 0; i < 2; ++i)
+	{
+
+		SDL_RenderFillRect(gRenderer, &gameEnd[i].rect);
+
+		render(&gameEnd[i].texture, gameEnd[i].rect.x + 40, gameEnd[i].rect.y);
+	}
+
+	SDL_RenderPresent(gRenderer);
+
 }
 
 void draw(Game* game, enum State st)
@@ -201,13 +231,19 @@ void draw(Game* game, enum State st)
 		drawGamePlay(game);
 		break;
 	case State_MainMenu:
-		drawMainMenu(game);
+		drawMainMenu();
 		break;
 	case State_ModeOptions:
-		drawModeOptions(game);
+		drawModeOptions();
 		break;
 	case State_LoadGame:
-		drawLoadGame(game);
+		drawLoadGame();
+		break;
+	case State_HighScore:
+		drawHighScore();
+		break;
+	case State_WinnerName:
+		drawWinnerName();
 		break;
 	default:
 		break;
@@ -337,6 +373,69 @@ void loadGameText(const char* opts[])
 	}
 }
 
+void highScoreText()
+{
+	char** names = (char**)malloc(SCORES * sizeof(char*));
+	for (int i = 0; i < SCORES; ++i)
+		names[i] = (char*)malloc(50 * sizeof(char));
+
+	numOfScores = getHighScores(names, SCORES);
+	if (numOfScores == -1)
+	{
+		printf("Coulding open the highScore file!\n");
+		return;
+	}
+
+	SDL_Color textColor = { 0x00, 0x00, 0x00 };
+	
+	int r = 0, c = 0;
+	for (int i = 0; i < numOfScores; ++i)
+	{
+		loadFromRenderedText(&scores[i].texture, names[i], textColor);
+		strcpy(scores[i].name, names[i]);
+		// memcpy(scores[i].name, names[i], strlen(names[i]));
+
+		if (SCREEN_HEIGHT * c / 9 >= SCREEN_HEIGHT)
+		{
+			r = 1;
+			c = 0;
+		}
+		scores[i].rect.x = 20 + r * SCREEN_WIDTH / 2;
+		scores[i].rect.y = SCREEN_HEIGHT * c++ / 9 + 10;
+		scores[i].rect.w = 250;
+		scores[i].rect.h = 50;
+	}
+	
+	for (int i = 0; i < SCORES; ++i)
+		free(names[i]);
+	free(names);
+
+	const char* opts[] = { "Enter your Name (max 50): "};
+
+
+	loadFromRenderedText(&gameEnd[0].texture, opts[0], textColor);
+	strcpy(gameEnd[0].name, opts[0]);
+
+	gameEnd[0].rect.x = SCREEN_WIDTH / 2 - 160;
+	gameEnd[0].rect.y = SCREEN_HEIGHT / 9;
+	gameEnd[0].rect.w = 350;
+	gameEnd[0].rect.h = 50;
+
+	gameEnd[1].name[0] = ' ';
+}
+
+void endGameText(Player* p)
+{
+	SDL_Color textColor = { 0x00, 0x00, 0x00 };
+	loadFromRenderedText(&gameEnd[1].texture, p->name, textColor);
+
+	gameEnd[1].rect.x = SCREEN_WIDTH / 2 - 200;
+	gameEnd[1].rect.y = SCREEN_HEIGHT / 2;
+	gameEnd[1].rect.w = 500;
+	gameEnd[1].rect.h = 50;
+
+}
+
 void renderText()
 {
 	const char* opts[] = {"Welcome to Connect4 Game Main Menu", "New Game", "Load Game", "HighScore", "Quit",
@@ -345,11 +444,14 @@ void renderText()
 	mainMenuText(opts);
 	modeOptionsText(opts);
 	loadGameText(opts);
+	highScoreText();
+	endGameText(&p1);
 }
 
 void close(Game* game)
 {
-	saveGame(game);
+	if (!game->gameEnded)
+		saveGame(game);
 
 	for (int i = 0; i < ROWS; ++i)
 		free(game->board[i]);
@@ -361,9 +463,12 @@ void close(Game* game)
 
 	for (int i = 0; i < Colors_TOTAL; ++i)
 		freeTexture(&circles[i]);
-
+	
 	for (int i = 0; i < BUTTONS_TOTAL; ++i)
-		freeTexture(&buttons[i]);
+		freeTexture(&buttons[i].texture);
+
+	for (int i = 0; i < numOfScores; ++i)
+		freeTexture(&scores[i].texture);
 
 	TTF_CloseFont(gFont);
 	gFont = NULL;

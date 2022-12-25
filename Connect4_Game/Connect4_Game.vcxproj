@@ -170,6 +170,7 @@
     <ClCompile Include="src\Engine.c" />
     <ClCompile Include="src\Game.c" />
     <ClCompile Include="src\GUI.c" />
+    <ClCompile Include="src\high_score.c" />
     <ClCompile Include="src\runApp.c" />
     <ClCompile Include="src\save_load_game.c" />
   </ItemGroup>
@@ -178,6 +179,7 @@
     <ClInclude Include="src\include\Engine.h" />
     <ClInclude Include="src\include\Game.h" />
     <ClInclude Include="src\include\GUI.h" />
+    <ClInclude Include="src\include\high_score.h" />
     <ClInclude Include="src\include\save_load_game.h" />
   </ItemGroup>
   <ItemGroup>
