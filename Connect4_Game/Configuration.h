@@ -1,5 +1,7 @@
 
-#pragma once
+#include <stdbool.h>
+
+static char currPath[51] = "./config.txt";
 
 typedef struct
 {
@@ -9,3 +11,8 @@ typedef struct
 } Configuration;
 
 Configuration config;
+
+
+
+ bool  readConfig(char *currPath);
+ void setConfig();
