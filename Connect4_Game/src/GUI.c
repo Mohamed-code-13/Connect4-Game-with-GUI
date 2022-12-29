@@ -5,7 +5,7 @@ const char* pathsCirclesImages[] = { "./images/wC.png", "./images/rC.png", "./im
 
 Texture circles[Colors_TOTAL];
 Texture player_1_text, player_2_text;
-Button gameEnd[7];
+Button gameEnd[9];
 Button scores[200];
 int numOfScores;
 
@@ -244,11 +244,24 @@ void drawDraw()
 	SDL_RenderPresent(gRenderer);
 }
 
-void computerWon()
+void drawComputerWon()
 {
 	SDL_SetRenderDrawColor(gRenderer, 0xAA, 0xAA, 0xAA, 0xFF);
 
 	for (int i = 5; i < 7; ++i)
+	{
+		SDL_RenderFillRect(gRenderer, &gameEnd[i].rect);
+		render(&gameEnd[i].texture, gameEnd[i].rect.x + 20, gameEnd[i].rect.y);
+	}
+
+	SDL_RenderPresent(gRenderer);
+}
+
+void drawLoadFailed()
+{
+	SDL_SetRenderDrawColor(gRenderer, 0xAA, 0xAA, 0xAA, 0xFF);
+
+	for (int i = 7; i < 9; ++i)
 	{
 		SDL_RenderFillRect(gRenderer, &gameEnd[i].rect);
 		render(&gameEnd[i].texture, gameEnd[i].rect.x + 20, gameEnd[i].rect.y);
@@ -286,7 +299,10 @@ void draw(Game* game, enum State st, Player* p)
 		drawDraw();
 		break;
 	case State_ComputerWon:
-		computerWon();
+		drawComputerWon();
+		break;
+	case State_LoadFailed:
+		drawLoadFailed();
 		break;
 	default:
 		break;
@@ -518,6 +534,26 @@ void computerWonDraw()
 	gameEnd[6].rect.h = 50;
 }
 
+void loadFailedText()
+{
+	SDL_Color textColor = { 0x00, 0x00, 0x00 };
+
+	const char* msgs[] = { "Failed to Load the game!", "Press Enter to return to Main Menu" };
+
+	loadFromRenderedText(&gameEnd[7].texture, msgs[0], textColor);
+	loadFromRenderedText(&gameEnd[8].texture, msgs[1], textColor);
+
+	gameEnd[7].rect.x = SCREEN_WIDTH / 2 - 120;
+	gameEnd[7].rect.y = SCREEN_HEIGHT / 9;
+	gameEnd[7].rect.w = 280;
+	gameEnd[7].rect.h = 50;
+
+	gameEnd[8].rect.x = SCREEN_WIDTH / 2 - 200;
+	gameEnd[8].rect.y = SCREEN_HEIGHT / 9 * 5;
+	gameEnd[8].rect.w = 400;
+	gameEnd[8].rect.h = 50;
+}
+
 void renderText()
 {
 	const char* opts[] = {"Welcome to Connect4 Game Main Menu", "New Game", "Resume", "Load Game", "HighScore", "Quit",
@@ -530,6 +566,7 @@ void renderText()
 	endGameText(&p1);
 	endGameDrawText();
 	computerWonDraw();
+	loadFailedText();
 }
 
 void close(Game* game)

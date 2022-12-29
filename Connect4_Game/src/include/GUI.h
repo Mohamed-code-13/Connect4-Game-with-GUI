@@ -35,6 +35,7 @@ enum State
 	State_WinnerName,
 	State_ComputerWon,
 	State_Draw,
+	State_LoadFailed,
 	State_Total
 };
 

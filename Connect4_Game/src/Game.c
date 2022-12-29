@@ -74,7 +74,7 @@ void runGame()
 							break;
 						}
 					}
-					else if (currentState == State_Draw || currentState == State_ComputerWon)
+					else if (currentState == State_Draw || currentState == State_ComputerWon || currentState == State_LoadFailed)
 					{
 						switch (e.key.keysym.sym)
 						{
@@ -212,18 +212,18 @@ void handleMouseLoadGame(int x, int y, Game* game, enum State* currentState)
 			switch (i)
 			{
 			case BUTTONS_game1:
-				loadGame(game, 1);
-				renderPlayerText(game);
+				loadGame(game, 1, currentState);
 				break;
 			case BUTTONS_game2:
-				loadGame(game, 2);
+				loadGame(game, 2, currentState);
 				break;
 			case BUTTONS_game3:
-				loadGame(game, 3);
+				loadGame(game, 3, currentState);
 				break;
 			default:
 				break;
 			}
+			renderPlayerText(game);
 		}
 	}
 }

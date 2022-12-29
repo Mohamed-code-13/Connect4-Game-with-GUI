@@ -33,7 +33,7 @@ int getHighScores(char** names, int h)
 
 	if (fptr == NULL)
 	{
-		printf("Unable to open the file!\n");
+		printf("Unable to open the highScore file!\n");
 		return -1;
 	}
 

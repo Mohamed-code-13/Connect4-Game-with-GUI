@@ -15,8 +15,12 @@ void saveGame(Game* game)
 	if (!fptr)
 	{
 		printf("Error\n");
-		exit(1);
+		return;
 	}
+
+	putw(ROWS, fptr);
+	putw(COLS, fptr);
+
 	for (int i = 0; i < ROWS; ++i)
 		fwrite(game->board[i], COLS * sizeof(char), 1, fptr);
 
@@ -33,10 +37,10 @@ void saveGame(Game* game)
 	fclose(fptr);
 }
 
-void loadGame(Game* game, int n)
+void loadGame(Game* game, int n, int* currentState)
 {
 	char* num = "1.bin";
-
+	
 	switch (n)
 	{
 	case 1:
@@ -57,8 +61,22 @@ void loadGame(Game* game, int n)
 
 	FILE* fptr = fopen(filePath, "rb");
 	if (!fptr)
+	{
+		*currentState = 8;
+		printf("Failed to load game!\n");
 		return;
+	}
 
+	int rows = getw(fptr);
+	int cols = getw(fptr);
+	/*
+	if (rows != ROWS || COLS != COLS)
+	{
+		*currentState = 8;
+		printf("Failed to load game!\n");
+		return;
+	}
+	*/
 	for (int i = 0; i < ROWS; ++i)
 		fread(game->board[i], COLS * sizeof(char), 1, fptr);
 
