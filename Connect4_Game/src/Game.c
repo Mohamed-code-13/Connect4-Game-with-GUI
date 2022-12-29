@@ -7,7 +7,6 @@ void runGame()
 {
 	Game game = createNewGame();
 	enum State currentState = State_MainMenu;
-	// loadGame(&game);
 
 	if (!init())
 		printf("Failed to initialize!\n");
@@ -58,6 +57,9 @@ void runGame()
 						switch (e.key.keysym.sym)
 						{
 						case SDLK_LEFT:
+							if (game.ai)
+								undoMove(&game);
+
 							undoMove(&game);
 							renderPlayerText(&game);
 							break;
@@ -72,6 +74,17 @@ void runGame()
 							break;
 						}
 					}
+					else if (currentState == State_Draw || currentState == State_ComputerWon)
+					{
+						switch (e.key.keysym.sym)
+						{
+						case SDLK_RETURN:
+							currentState = State_MainMenu;
+							break;
+						default:
+							break;
+						}
+					}
 					else
 					{
 						switch (e.key.keysym.sym)
@@ -79,16 +92,13 @@ void runGame()
 						case SDLK_ESCAPE:
 							currentState = State_MainMenu;
 							break;
-						case SDLK_SPACE:
-							currentState = State_WinnerName;
-							typing = true;
-							break;
 						default:
 							break;
 						}
 					}
 				}
 				
+				draw(&game, currentState, NULL);
 
 				int winner = endGame(&game);
 				if (winner && !game.gameEnded)
@@ -97,12 +107,17 @@ void runGame()
 					typing = true;
 				}
 
-				draw(&game, currentState);
-
 				if (winner == 1)
 					handleTyping(&e, &typing, &p1, &game, &currentState);
 				else if (winner == 2)
 					handleTyping(&e, &typing, &p2, &game, &currentState);
+				else if (winner == 3)
+				{
+					currentState = State_Draw;
+					typing = false;
+					game = createNewGame();
+				}
+				
 			}
 		}
 	}
@@ -215,11 +230,23 @@ void handleMouseLoadGame(int x, int y, Game* game, enum State* currentState)
 
 void handleTyping(SDL_Event* e, bool* typing, Player* winner, Game* game, enum State* currentState)
 {
+	if (game->ai && winner->color == 'g')
+	{
+		*currentState = State_ComputerWon;
+		*game = createNewGame();
+		*typing = false;
+		return;
+	}
+
 	SDL_StartTextInput();
+
 	while (*typing)
 	{
 		while (SDL_WaitEvent(e))
 		{
+			endGameText(winner);
+			draw(game, *currentState, winner);
+
 			if (e->type == SDL_QUIT)
 			{
 				*typing = false;
@@ -240,14 +267,7 @@ void handleTyping(SDL_Event* e, bool* typing, Player* winner, Game* game, enum S
 					winner->name[strlen(winner->name) - 1] = 0;
 
 				else if (e->type == SDL_TEXTINPUT)
-				{
 					strcat(winner->name, e->text.text);
-				}
-				printf("%s\n", winner->name);
-
-				endGameText(winner);
-				draw(game, *currentState);
-
 			}
 		}
 	}
@@ -256,5 +276,4 @@ void handleTyping(SDL_Event* e, bool* typing, Player* winner, Game* game, enum S
 	saveHighScore(winner->name, winner->score);
 	highScoreText();
 	game->gameEnded = true;
-	// *game = createNewGame();
 }

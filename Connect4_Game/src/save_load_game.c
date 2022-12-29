@@ -25,6 +25,7 @@ void saveGame(Game* game)
 	putw(game->currMove, fptr);
 	putw(game->totalMoves, fptr);
 	fwrite(&(game->p1First), sizeof(bool), 1, fptr);
+	fwrite(&(game->ai), sizeof(bool), 1, fptr);
 
 	putw(p1.score, fptr);
 	putw(p2.score, fptr);
@@ -66,6 +67,7 @@ void loadGame(Game* game, int n)
 	game->currMove = getw(fptr);
 	game->totalMoves = getw(fptr);	
 	fread(&(game->p1First), sizeof(bool), 1, fptr);
+	fread(&(game->ai), sizeof(bool), 1, fptr);
 
 	p1.score = getw(fptr);
 	p2.score = getw(fptr);

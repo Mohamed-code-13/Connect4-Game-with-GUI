@@ -166,7 +166,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\ai.c" />
+    <ClCompile Include="src\computer.c" />
     <ClCompile Include="src\Configuration.c" />
     <ClCompile Include="src\Engine.c" />
     <ClCompile Include="src\Game.c" />
@@ -176,7 +176,7 @@
     <ClCompile Include="src\save_load_game.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\include\ai.h" />
+    <ClInclude Include="src\include\computer.h" />
     <ClInclude Include="src\include\Configuration.h" />
     <ClInclude Include="src\include\Engine.h" />
     <ClInclude Include="src\include\Game.h" />

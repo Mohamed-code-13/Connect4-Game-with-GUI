@@ -36,7 +36,7 @@
     <ClCompile Include="src\high_score.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ai.c">
+    <ClCompile Include="src\computer.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -59,7 +59,7 @@
     <ClInclude Include="src\include\high_score.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\include\ai.h">
+    <ClInclude Include="src\include\computer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

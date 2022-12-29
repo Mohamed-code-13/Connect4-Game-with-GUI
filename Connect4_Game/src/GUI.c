@@ -3,6 +3,16 @@
 
 const char* pathsCirclesImages[] = { "./images/wC.png", "./images/rC.png", "./images/gC.png" };
 
+Texture circles[Colors_TOTAL];
+Texture player_1_text, player_2_text;
+Button gameEnd[7];
+Button scores[200];
+int numOfScores;
+
+SDL_Window* gWindow;
+SDL_Renderer* gRenderer;
+TTF_Font* gFont;
+
 bool init()
 {
 	bool success = true;
@@ -204,23 +214,50 @@ void drawHighScore()
 	SDL_RenderPresent(gRenderer);
 }
 
-void drawWinnerName()
+void drawWinnerName(Player* p)
 {
-	SDL_SetRenderDrawColor(gRenderer, 0x66, 0xF9, 0x5B, 0xFF);
+	if (p->color == 'r')
+		SDL_SetRenderDrawColor(gRenderer, 0xFF, 0x00, 0x00, 0xFF);
+	else
+		SDL_SetRenderDrawColor(gRenderer, 0x00, 0xFF, 0x00, 0xFF);
 
-	for (int i = 0; i < 2; ++i)
+	for (int i = 0; i < 3; ++i)
 	{
-
 		SDL_RenderFillRect(gRenderer, &gameEnd[i].rect);
 
 		render(&gameEnd[i].texture, gameEnd[i].rect.x + 40, gameEnd[i].rect.y);
 	}
 
 	SDL_RenderPresent(gRenderer);
-
 }
 
-void draw(Game* game, enum State st)
+void drawDraw()
+{
+	SDL_SetRenderDrawColor(gRenderer, 0xAA, 0xAA, 0xAA, 0xFF);
+
+	for (int i = 3; i < 5; ++i)
+	{
+		SDL_RenderFillRect(gRenderer, &gameEnd[i].rect);
+		render(&gameEnd[i].texture, gameEnd[i].rect.x + 20, gameEnd[i].rect.y);
+	}
+
+	SDL_RenderPresent(gRenderer);
+}
+
+void computerWon()
+{
+	SDL_SetRenderDrawColor(gRenderer, 0xAA, 0xAA, 0xAA, 0xFF);
+
+	for (int i = 5; i < 7; ++i)
+	{
+		SDL_RenderFillRect(gRenderer, &gameEnd[i].rect);
+		render(&gameEnd[i].texture, gameEnd[i].rect.x + 20, gameEnd[i].rect.y);
+	}
+
+	SDL_RenderPresent(gRenderer);
+}
+
+void draw(Game* game, enum State st, Player* p)
 {
 	SDL_SetRenderDrawColor(gRenderer, 0x3E, 0x3E, 0xFF, 0xFF);
 	SDL_RenderClear(gRenderer);
@@ -243,7 +280,13 @@ void draw(Game* game, enum State st)
 		drawHighScore();
 		break;
 	case State_WinnerName:
-		drawWinnerName();
+		drawWinnerName(p);
+		break;
+	case State_Draw:
+		drawDraw();
+		break;
+	case State_ComputerWon:
+		computerWon();
 		break;
 	default:
 		break;
@@ -322,7 +365,6 @@ void mainMenuText(const char* opts[])
 	SDL_Color textColor = { 0x00, 0x00, 0x00 };
 
 	loadFromRenderedText(&buttons[0].texture, opts[0], textColor);
-	strcpy(buttons[0].name, opts[0]);
 
 	buttons[0].rect.x = SCREEN_WIDTH / 2 - 220;
 	buttons[0].rect.y = SCREEN_HEIGHT / 9.0;
@@ -332,7 +374,6 @@ void mainMenuText(const char* opts[])
 	for (int i = BUTTONS_newGame; i < BUTTONS_TotalMainMenu; ++i)
 	{
 		loadFromRenderedText(&buttons[i].texture, opts[i], textColor);
-		strcpy(buttons[i].name, opts[i]);
 
 		buttons[i].rect.x = SCREEN_WIDTH / 2 - 80;
 		buttons[i].rect.y = SCREEN_HEIGHT * (i / 9.0 + 2 / 9.0);
@@ -348,7 +389,6 @@ void modeOptionsText(const char* opts[])
 	for (int i = BUTTONS_HvH; i < BUTTONS_TotalMode; ++i)
 	{
 		loadFromRenderedText(&buttons[i].texture, opts[i], textColor);
-		strcpy(buttons[i].name, opts[i]);
 
 		buttons[i].rect.x = SCREEN_WIDTH / 2 - 130;
 		buttons[i].rect.y = SCREEN_HEIGHT * ((i - 2) / 9.0);
@@ -364,7 +404,6 @@ void loadGameText(const char* opts[])
 	for (int i = BUTTONS_game1; i < BUTTONS_TOTAL; ++i)
 	{
 		loadFromRenderedText(&buttons[i].texture, opts[i], textColor);
-		strcpy(buttons[i].name, opts[i]);
 
 		buttons[i].rect.x = SCREEN_WIDTH / 2 - 120;
 		buttons[i].rect.y = SCREEN_HEIGHT * ((i - 5) / 9.0);
@@ -392,8 +431,6 @@ void highScoreText()
 	for (int i = 0; i < numOfScores; ++i)
 	{
 		loadFromRenderedText(&scores[i].texture, names[i], textColor);
-		strcpy(scores[i].name, names[i]);
-		// memcpy(scores[i].name, names[i], strlen(names[i]));
 
 		if (SCREEN_HEIGHT * c / 9 >= SCREEN_HEIGHT)
 		{
@@ -414,38 +451,85 @@ void highScoreText()
 void endGameText(Player* p)
 {
 	SDL_Color textColor = { 0x00, 0x00, 0x00 };
-	loadFromRenderedText(&gameEnd[1].texture, p->name, textColor);
 
-	gameEnd[1].rect.x = SCREEN_WIDTH / 2 - 200;
-	gameEnd[1].rect.y = SCREEN_HEIGHT / 2;
-	gameEnd[1].rect.w = 500;
-	gameEnd[1].rect.h = 50;
+	const char* end = "Enter your Name (max 50): ";
+	const char* winnerMsg;
+
+	if (p->color == 'r')
+		winnerMsg = "Player (RED) won. Congraturlations!";
+	else
+		winnerMsg = "Player (GREEN) won. Congraturlations!";
+
+	loadFromRenderedText(&gameEnd[0].texture, winnerMsg, textColor);
+	loadFromRenderedText(&gameEnd[1].texture, end, textColor);
+	loadFromRenderedText(&gameEnd[2].texture, p->name, textColor);
+
+	gameEnd[0].rect.x = SCREEN_WIDTH / 2 - 200;
+	gameEnd[0].rect.y = SCREEN_HEIGHT / 9;
+	gameEnd[0].rect.w = 470;
+	gameEnd[0].rect.h = 50;
+
+	for (int i = 1; i < 3; ++i)
+	{
+		gameEnd[i].rect.x = SCREEN_WIDTH / 2 - 160;
+		gameEnd[i].rect.y = SCREEN_HEIGHT / 9 * ( i + 3 );
+		gameEnd[i].rect.w = 350;
+		gameEnd[i].rect.h = 50;
+	}
+}
+
+void endGameDrawText()
+{
+	SDL_Color textColor = { 0x00, 0x00, 0x00 };
+
+	const char* msgs[] = { "It's Draw!", "Press Enter to return to Main Menu" };
+
+	loadFromRenderedText(&gameEnd[3].texture, msgs[0], textColor);
+	loadFromRenderedText(&gameEnd[4].texture, msgs[1], textColor);
+
+	gameEnd[3].rect.x = SCREEN_WIDTH / 2 - 50;
+	gameEnd[3].rect.y = SCREEN_HEIGHT / 9;
+	gameEnd[3].rect.w = 130;
+	gameEnd[3].rect.h = 50;
+
+	gameEnd[4].rect.x = SCREEN_WIDTH / 2 - 200;
+	gameEnd[4].rect.y = SCREEN_HEIGHT / 9 * 5;
+	gameEnd[4].rect.w = 400;
+	gameEnd[4].rect.h = 50;
+}
+
+void computerWonDraw()
+{
+	SDL_Color textColor = { 0x00, 0x00, 0x00 };
+
+	const char* msgs[] = { "Computer Won!", "Press Enter to return to Main Menu" };
+
+	loadFromRenderedText(&gameEnd[5].texture, msgs[0], textColor);
+	loadFromRenderedText(&gameEnd[6].texture, msgs[1], textColor);
+
+	gameEnd[5].rect.x = SCREEN_WIDTH / 2 - 80;
+	gameEnd[5].rect.y = SCREEN_HEIGHT / 9;
+	gameEnd[5].rect.w = 200;
+	gameEnd[5].rect.h = 50;
+
+	gameEnd[6].rect.x = SCREEN_WIDTH / 2 - 200;
+	gameEnd[6].rect.y = SCREEN_HEIGHT / 9 * 5;
+	gameEnd[6].rect.w = 400;
+	gameEnd[6].rect.h = 50;
 }
 
 void renderText()
 {
-	SDL_Color textColor = { 0x00, 0x00, 0x00 };
-
 	const char* opts[] = {"Welcome to Connect4 Game Main Menu", "New Game", "Resume", "Load Game", "HighScore", "Quit",
 							"Human vs Human", "Human vs Computer", "Game 1 (Latest)", "Game 2", "Game 3 (Oldest)"};
-
-	const char* end[] = { "Enter your Name (max 50): " };
-
-	loadFromRenderedText(&gameEnd[0].texture, end[0], textColor);
-	strcpy(gameEnd[0].name, end[0]);
-
-	gameEnd[0].rect.x = SCREEN_WIDTH / 2 - 160;
-	gameEnd[0].rect.y = SCREEN_HEIGHT / 9;
-	gameEnd[0].rect.w = 350;
-	gameEnd[0].rect.h = 50;
-
-	gameEnd[1].name[0] = ' ';
 
 	mainMenuText(opts);
 	modeOptionsText(opts);
 	loadGameText(opts);
 	highScoreText();
 	endGameText(&p1);
+	endGameDrawText();
+	computerWonDraw();
 }
 
 void close(Game* game)
@@ -469,6 +553,9 @@ void close(Game* game)
 
 	for (int i = 0; i < numOfScores; ++i)
 		freeTexture(&scores[i].texture);
+
+	for (int i = 0; i < 3; ++i)
+		freeTexture(&gameEnd[i].texture);
 
 	TTF_CloseFont(gFont);
 	gFont = NULL;

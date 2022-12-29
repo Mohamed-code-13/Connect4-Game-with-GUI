@@ -15,7 +15,6 @@ typedef struct
 {
 	Texture texture;
 	SDL_Rect rect;
-	char name[50];
 } Button;
 
 enum Colors
@@ -34,6 +33,8 @@ enum State
 	State_LoadGame,
 	State_HighScore,
 	State_WinnerName,
+	State_ComputerWon,
+	State_Draw,
 	State_Total
 };
 
@@ -56,22 +57,11 @@ enum BUTTONS
 	BUTTONS_TotalSavedGames = 11,
 };
 
-Texture circles[Colors_TOTAL];
-Texture player_1_text, player_2_text;
 Button buttons[BUTTONS_TOTAL];
-Button gameEnd[2];
-
-Button scores[200];
-int numOfScores;
-
-SDL_Window* gWindow;
-SDL_Renderer* gRenderer;
-TTF_Font* gFont;
-
 
 bool init();
 void loadMedia(Game* game);
-void draw(Game* game, enum State st);
+void draw(Game* game, enum State st, Player* p);
 void renderText();
 void renderPlayerText(Game* game);
 void close(Game* game);
