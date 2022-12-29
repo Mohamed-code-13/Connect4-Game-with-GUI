@@ -2,7 +2,8 @@
 
 
 void runGame()
-{
+{   setConfig();
+
 	Game game = createNewGame();
 	enum State currentState = State_MainMenu;
 	// loadGame(&game);
