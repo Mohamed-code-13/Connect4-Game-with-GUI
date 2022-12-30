@@ -9,4 +9,4 @@ typedef struct Configu
 
 Configuration config;
 
-void readXML();
+void readXML(const char* xmlPath);

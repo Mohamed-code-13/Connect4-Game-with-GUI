@@ -5,7 +5,7 @@
 
 void runGame()
 {
-	readXML();
+	readXML("Data/Configurations/config.xml");
 
 	Game game = createNewGame();
 	enum State currentState = State_MainMenu;

@@ -2,10 +2,43 @@
 
 #include <libxml/parser.h>
 #include <libxml/tree.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include "include/Configuration.h"
 
 Configuration config = { 4, 4, 10 };
+
+int userTries = 0;
+
+void getPathFromUser(char path[])
+{
+	printf("Enter the path for the xml File: ");
+	fgets(path, 150, stdin);
+	path[strlen(path) - 1] = 0;
+
+	printf("The path is: %s\n", path);
+}
+
+void handleUserInput()
+{
+	printf("Invalid!\n");
+
+	if (++userTries == 3)
+	{
+		printf("Loading default values. Height = 7, Width = 9, HighScores = 10\n");
+
+		config.height = 7;
+		config.width = 9;
+		config.highScore = 10;
+
+		return;
+	}
+
+	char path[151];
+	getPathFromUser(path);
+	readXML(path);
+}
 
 int hasChildren(xmlNode* node)
 {
@@ -17,20 +50,30 @@ int hasChildren(xmlNode* node)
 	return 0;
 }
 
-void parseXML(xmlNode* node)
+int validDim(char* node)
 {
+	char* digits = strtok(node, " \n");
 
+	for (int i = 0; i < strlen(digits); ++i)
+		if (!isdigit(digits[i]))
+			return -1;
+
+	return atoi(digits);
+}
+
+int parseXML(xmlNode* node)
+{
 	for (xmlNode* cur_node = node; cur_node; cur_node =
 		cur_node->next)
 	{
 		if (hasChildren(cur_node->children))
-		{
-			printf("Invalid!\n");
-			return;
-		}
+			return -1;
+
 		if (cur_node->type == XML_ELEMENT_NODE)
 		{
-			int num = atoi(strtok(xmlNodeGetContent(cur_node), " \n"));
+			int num = validDim(xmlNodeGetContent(cur_node));
+			if (num == -1)
+				return -1;
 			
 			if (!strcmp(cur_node->name, "Height"))
 			{
@@ -49,27 +92,32 @@ void parseXML(xmlNode* node)
 			}
 		}
 	}
+	return 0;
 }
 
 // From stackoverflow: https://stackoverflow.com/questions/54380904/count-words-from-a-string-with-multiple-empty-spaces
-int word_count(const char* s) {
+int word_count(const char* s) 
+{
 	int count = 0;
-	while (*(s += strspn(s, " \n"))) {  // Advance s by the matching delimiters.
+	while (*(s += strspn(s, " \n")))  // Advance s by the matching delimiters.
+	{
 		count++;
 		s += strcspn(s, " \n");  // Advance s by the non-matching delimiters.
 	}
 	return count;
 }
 
-void readXML()
+void readXML(const char* xmlPath)
 {
 	xmlDoc* doc = NULL;
 	xmlNode* root_element = NULL;
 
-	doc = xmlReadFile("Data/Configurations/config.xml", NULL, 0);
+	doc = xmlReadFile(xmlPath, NULL, 0);
 	
-	if (doc == NULL) {
-		printf("Invalid\n");
+	if (doc == NULL) 
+	{
+		handleUserInput();
+
 		return;
 	}
 
@@ -80,12 +128,17 @@ void readXML()
 	{
 		int contents_in_config = word_count(xmlNodeGetContent(root_element));
 		if (contents_in_config != 3)
-			printf("Invalid!\n");
+			handleUserInput();
+
 		else
-			parseXML(root_element->children);
+		{
+			int state = parseXML(root_element->children);
+			if (state == -1)
+				handleUserInput();
+		}
 	}
 	else
-		printf("Invalid!\n");
+		handleUserInput();
 
 	xmlFreeDoc(doc);    // free document
 	xmlCleanupParser(); // Free globals
