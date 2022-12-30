@@ -66,4 +66,7 @@
   <ItemGroup>
     <Font Include="acme.ttf" />
   </ItemGroup>
+  <ItemGroup>
+    <Xml Include="Data\Configurations\config.xml" />
+  </ItemGroup>
 </Project>

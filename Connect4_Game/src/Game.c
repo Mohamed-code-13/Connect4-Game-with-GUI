@@ -5,6 +5,8 @@
 
 void runGame()
 {
+	readXML();
+
 	Game game = createNewGame();
 	enum State currentState = State_MainMenu;
 

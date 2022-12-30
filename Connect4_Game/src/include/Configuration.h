@@ -8,3 +8,5 @@ typedef struct Configu
 } Configuration;
 
 Configuration config;
+
+void readXML();

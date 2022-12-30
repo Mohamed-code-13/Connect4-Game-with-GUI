@@ -86,14 +86,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)$(ProjectName)\bin\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(ProjectName)\bin\$(Configuration)\intermediate\</IntDir>
-    <IncludePath>$(SolutionDir)$(ProjectName)\Libraries\SDL2\include;$(SolutionDir)$(ProjectName)\Libraries\SDL2_image\include;C:\coding\Connect4_Game\Connect4_Game\Libraries\SDL2_ttf\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)$(ProjectName)\Libraries\SDL2\lib\x64;$(SolutionDir)$(ProjectName)\Libraries\SDL2_image\lib\x64;C:\coding\Connect4_Game\Connect4_Game\Libraries\SDL2_ttf\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)$(ProjectName)\Libraries\SDL2\include;$(SolutionDir)$(ProjectName)\Libraries\SDL2_image\include;C:\coding\Connect4_Game\Connect4_Game\Libraries\SDL2_ttf\include;C:\coding\Connect4_Game\Connect4_Game\Libraries\Libxml2\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)$(ProjectName)\Libraries\SDL2\lib\x64;$(SolutionDir)$(ProjectName)\Libraries\SDL2_image\lib\x64;C:\coding\Connect4_Game\Connect4_Game\Libraries\SDL2_ttf\lib\x64;C:\coding\Connect4_Game\Connect4_Game\Libraries\Libxml2\lib\dynamic\cdecl;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)$(ProjectName)\bin\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)$(ProjectName)\bin\$(Configuration)\intermediate\</IntDir>
-    <IncludePath>$(SolutionDir)$(ProjectName)\Libraries\SDL2\include;$(SolutionDir)$(ProjectName)\Libraries\SDL2_image\include;C:\coding\Connect4_Game\Connect4_Game\Libraries\SDL2_ttf\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)$(ProjectName)\Libraries\SDL2\lib\x64;$(SolutionDir)$(ProjectName)\Libraries\SDL2_image\lib\x64;C:\coding\Connect4_Game\Connect4_Game\Libraries\SDL2_ttf\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)$(ProjectName)\Libraries\SDL2\include;$(SolutionDir)$(ProjectName)\Libraries\SDL2_image\include;C:\coding\Connect4_Game\Connect4_Game\Libraries\SDL2_ttf\include;C:\coding\Connect4_Game\Connect4_Game\Libraries\Libxml2\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)$(ProjectName)\Libraries\SDL2\lib\x64;$(SolutionDir)$(ProjectName)\Libraries\SDL2_image\lib\x64;C:\coding\Connect4_Game\Connect4_Game\Libraries\SDL2_ttf\lib\x64;C:\coding\Connect4_Game\Connect4_Game\Libraries\Libxml2\lib\dynamic\cdecl;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -142,7 +142,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)$(ProjectName)\Libraries\SDL2\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;libxml2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -162,7 +162,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)$(ProjectName)\Libraries\SDL2\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;libxml2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -186,6 +186,9 @@
   </ItemGroup>
   <ItemGroup>
     <Font Include="acme.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="Data\Configurations\config.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
