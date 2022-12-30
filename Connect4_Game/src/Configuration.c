@@ -7,7 +7,7 @@
 #include <string.h>
 #include "include/Configuration.h"
 
-Configuration config = { 4, 4, 10 };
+Configuration config = { 7, 9, 10 };
 
 int userTries = 0;
 
@@ -63,6 +63,8 @@ int validDim(char* node)
 
 int parseXML(xmlNode* node)
 {
+	int widthCount = 0, heightCount = 0, highScoreCount = 0;
+
 	for (xmlNode* cur_node = node; cur_node; cur_node =
 		cur_node->next)
 	{
@@ -79,20 +81,25 @@ int parseXML(xmlNode* node)
 			{
 				printf("Height: %d\n", num);
 				config.height = num;
+				heightCount++;
 			}
 			else if (!strcmp(cur_node->name, "Width"))
 			{
 				printf("Width: %d\n", num);
 				config.width = num;
+				widthCount++;
 			}
 			else if (!strcmp(cur_node->name, "Highscores"))
 			{
 				printf("Highscores: %d\n", num);
 				config.highScore = num;
+				highScoreCount++;
 			}
 		}
 	}
-	return 0;
+	if (widthCount && heightCount && highScoreCount)
+		return 0;
+	return -1;
 }
 
 // From stackoverflow: https://stackoverflow.com/questions/54380904/count-words-from-a-string-with-multiple-empty-spaces
@@ -127,7 +134,7 @@ void readXML(const char* xmlPath)
 	if (!strcmp(root_element->name, "Configurations"))
 	{
 		int contents_in_config = word_count(xmlNodeGetContent(root_element));
-		if (contents_in_config != 3)
+		if (contents_in_config != 3 || xmlChildElementCount(root_element) != 3)
 			handleUserInput();
 
 		else
