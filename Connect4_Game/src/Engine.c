@@ -49,27 +49,30 @@ void flipPlayer(Game* game)
 
 void makeMove(Game* game, int col)
 {
+	// Searching for an empty slot to put the disk in it.
 	for (int i = ROWS - 1; i >= 0; i--)
 	{
 		if (game->board[i][col] == '-')
 		{
 			if (game->p1First)
 			{
-				game->board[i][col] = p1.color;
-				updateScore(game, &p1, col, 1);
+				game->board[i][col] = p1.color;  // Updating the board with the player's color.
+				updateScore(game, &p1, col, 1);  // Updating the score of the player.
 			}
 			else
 			{
-				game->board[i][col] = p2.color;
-				updateScore(game, &p2, col, 1);
+				game->board[i][col] = p2.color;  // Updating the board with the player's color.
+				updateScore(game, &p2, col, 1);  // Updating the score of the player.
 			}
 
 			flipPlayer(game);
 			
+			// Handling the redo.
 			if (game->totalMoves < game->currMove || game->log[game->currMove] != col)
 				game->totalMoves = game->currMove + 1;
-			game->log[game->currMove++] = col;
+			game->log[game->currMove++] = col;  // Adding the current move to the log.
 
+			// Making the computer play his move if the mode of the game was Human vs Computer.
 			if (game->ai && !game->p1First)
 				makeMove(game, getCol(game->board, ROWS, COLS, col));
 
@@ -119,6 +122,7 @@ void updateScore(Game* game, Player* player, int c, int increment)
 	player->score += calcDiagonally(game, c) * increment;
 }
 
+// Getting the first row that has free slot in that column.
 int getRow(Game* game, int c)
 {
 	for (int i = 0; i < ROWS; ++i)
@@ -207,28 +211,23 @@ int calcDiagonally(Game* game, int c)
 	return connected;
 }
 
+// Checking if the game has ended.
 int endGame(Game* game)
 {
 	if (game->gameEnded)
 		return 4;
 
+	// Return 0 if the game hasn't ended yet.
 	if (game->currMove != ROWS * COLS)
 		return 0;
 
-	printf("The games has Ended!\n");
+	// Return 1 if player 1 won.
 	if (p1.score > p2.score)
-	{
-		printf("Player 1 won! Congratulations\n");
 		return 1;
-	}
+	// Return 2 if player 1 won.
 	else if (p1.score < p2.score)
-	{
-		printf("Player 2 won! Congratulations\n");
 		return 2;
-	}
+	// Return 3 if it's draw.
 	else
-	{
-		printf("It's a Draw\n");
 		return 3;
-	}
 }

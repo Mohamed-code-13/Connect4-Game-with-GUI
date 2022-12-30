@@ -1,5 +1,12 @@
 #include "include/computer.h"
 
+/*
+* The computer Algorithm:
+*   1 - Try to play above the previous play.
+*   2 - If that can't happen. Try play at the right of that play.
+*   3 - If that can't happen. Try play at the left of that play.
+*/
+
 int getColLeft(char** board, int rows, int c)
 {
 	if (c == -1)

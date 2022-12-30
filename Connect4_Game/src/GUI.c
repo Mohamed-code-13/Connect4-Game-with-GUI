@@ -13,6 +13,7 @@ SDL_Window* gWindow;
 SDL_Renderer* gRenderer;
 TTF_Font* gFont;
 
+// Initializing the SDL and creating a new window.
 bool init()
 {
 	bool success = true;
@@ -78,6 +79,7 @@ void freeTexture(Texture* tex)
 	}
 }
 
+// Loading Images to the game.
 bool loadFromFile(Texture* texture, const char* path)
 {
 	freeTexture(texture);
@@ -96,10 +98,12 @@ bool loadFromFile(Texture* texture, const char* path)
 			printf("Unable to create texture from %s! SDL Error: %s\n", path, SDL_GetError());
 		else
 		{
+			// Getting the new dimensions.
 			texture->mHeight = loadSurface->h;
 			texture->mWidth = loadSurface->w;
 		}
 
+		// Freeing old surface.
 		SDL_FreeSurface(loadSurface);
 	}
 
@@ -112,12 +116,14 @@ void loadMedia(Game* game)
 	for (int i = 0; i < Colors_TOTAL; ++i)
 		loadFromFile(&circles[i], pathsCirclesImages[i]);
 
+	// Initializing the font.
 	gFont = TTF_OpenFont("./Data/oswald.ttf", 28);
 
 	renderPlayerText(game);
 	renderText();
 }
 
+// Drawing the board with each player score and who has to play.
 void drawGamePlay(Game* game)
 {
 	SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);
@@ -318,7 +324,7 @@ void draw(Game* game, enum State st, Player* p)
 	}
 }
 
-
+// Loading text to the game window.
 bool loadFromRenderedText(Texture* texture, const char* textureText, SDL_Color textColor)
 {
 	freeTexture(texture);
@@ -326,31 +332,28 @@ bool loadFromRenderedText(Texture* texture, const char* textureText, SDL_Color t
 	SDL_Surface* textSurface = TTF_RenderText_Solid(gFont, textureText, textColor);
 
 	if (textSurface == NULL)
-	{
 		printf("Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError());
-	}
 	else
 	{
-		//Create texture from surface pixels
 		texture->mTexture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
 		if (texture->mTexture == NULL)
-		{
 			printf("Unable to create texture from rendered text! SDL Error: %s\n", SDL_GetError());
-		}
 		else
 		{
-			//Get image dimensions
+			// Getting the new dimensions.
 			texture->mWidth = textSurface->w;
 			texture->mHeight = textSurface->h;
 		}
 
-		//Get rid of old surface
+		// Freeing old surface.
 		SDL_FreeSurface(textSurface);
 	}
 
 	return texture->mTexture != NULL;
 }
 
+// Text for each player to display in the game play.
+// ex. RED Player Score: 0  (Your turn).
 void getText(char* txt, Player* p, bool p1First)
 {
 	char sc[15];
@@ -374,17 +377,18 @@ void renderPlayerText(Game* game)
 {
 	char* p_text = (char*)malloc(50 * sizeof(char));
 
-	SDL_Color textColor = { 255, 0, 0 };
+	SDL_Color textColor_red = { 255, 0, 0 };
 	getText(p_text, &p1, game->p1First);
-	loadFromRenderedText(&player_1_text, p_text, textColor);
+	loadFromRenderedText(&player_1_text, p_text, textColor_red);
 
-	SDL_Color textColor2 = { 0, 255, 0 };
+	SDL_Color textColor_green = { 0, 255, 0 };
 	getText(p_text, &p2, !(game->p1First));
-	loadFromRenderedText(&player_2_text, p_text, textColor2);
+	loadFromRenderedText(&player_2_text, p_text, textColor_green);
 
 	free(p_text);
 }
 
+// Initializing main menu text.
 void mainMenuText(const char* opts[])
 {
 	SDL_Color textColor = { 0x00, 0x00, 0x00 };
@@ -407,6 +411,7 @@ void mainMenuText(const char* opts[])
 	}
 }
 
+// Initializing mode optings text.
 void modeOptionsText(const char* opts[])
 {
 	SDL_Color textColor = { 0x00, 0x00, 0x00 };
@@ -422,6 +427,7 @@ void modeOptionsText(const char* opts[])
 	}
 }
 
+// Initializing load game text.
 void loadGameText(const char* opts[])
 {
 	SDL_Color textColor = { 0x00, 0x00, 0x00 };
@@ -437,6 +443,7 @@ void loadGameText(const char* opts[])
 	}
 }
 
+// Initializing high score board text.
 void highScoreText()
 {
 	char** names = (char**)malloc(SCORES * sizeof(char*));
@@ -473,6 +480,7 @@ void highScoreText()
 	free(names);
 }
 
+// Initializing end game page text when one player won.
 void endGameText(Player* p)
 {
 	SDL_Color textColor = { 0x00, 0x00, 0x00 };
@@ -503,6 +511,7 @@ void endGameText(Player* p)
 	}
 }
 
+// Initializing end game page text when it's draw.
 void endGameDrawText()
 {
 	SDL_Color textColor = { 0x00, 0x00, 0x00 };
@@ -523,6 +532,7 @@ void endGameDrawText()
 	gameEnd[4].rect.h = 50;
 }
 
+// Initializing end game page text when the computer won.
 void computerWonDraw()
 {
 	SDL_Color textColor = { 0x00, 0x00, 0x00 };
@@ -543,41 +553,7 @@ void computerWonDraw()
 	gameEnd[6].rect.h = 50;
 }
 
-void getTime(Game* game, char timeTook[70])
-{
-	game->timeUsed += ((int)(game->timeEnded - game->timeStarted)) / CLOCKS_PER_SEC;
-
-	int mins = game->timeUsed / 60;
-	int seconds = game->timeUsed % 60;
-
-	char mins_string[5];
-	char seconds_string[5];
-
-	sprintf(mins_string, "%d", mins);
-	sprintf(seconds_string, "%d", seconds);
-
-	strcat(timeTook, mins_string);
-	strcat(timeTook, " mins and ");
-
-	strcat(timeTook, seconds_string);
-	strcat(timeTook, " seconds.");
-}
-
-void timeText(Game* game)
-{
-	SDL_Color textColor = { 0x00, 0x00, 0x00 };
-
-	char timeTook[50] = "Time took: ";
-	getTime(game, timeTook);
-
-	loadFromRenderedText(&gameEnd[9].texture, timeTook, textColor);
-
-	gameEnd[9].rect.x = SCREEN_WIDTH / 2 - 200;
-	gameEnd[9].rect.y = SCREEN_HEIGHT / 9 * 3;
-	gameEnd[9].rect.w = 400;
-	gameEnd[9].rect.h = 50;
-}
-
+// Initializing load failed page text.
 void loadFailedText()
 {
 	SDL_Color textColor = { 0x00, 0x00, 0x00 };
@@ -598,6 +574,45 @@ void loadFailedText()
 	gameEnd[8].rect.h = 50;
 }
 
+// Calculating the time of the game and displaying it.
+void getTime(Game* game, char timeTook[70])
+{
+	game->timeUsed += ((int)(game->timeEnded - game->timeStarted)) / CLOCKS_PER_SEC;
+
+	int mins = game->timeUsed / 60;
+	int seconds = game->timeUsed % 60;
+
+	char mins_string[5];
+	char seconds_string[5];
+
+	// Converting int time to string.
+	sprintf(mins_string, "%d", mins);
+	sprintf(seconds_string, "%d", seconds);
+
+	// Concatenating the mins with the original string.
+	strcat(timeTook, mins_string);
+	strcat(timeTook, " mins and ");
+
+	// Concatenating the seconds with the original string.
+	strcat(timeTook, seconds_string);
+	strcat(timeTook, " seconds.");
+}
+
+void timeText(Game* game)
+{
+	SDL_Color textColor = { 0x00, 0x00, 0x00 };
+
+	char timeTook[50] = "Time took: ";
+	getTime(game, timeTook);
+
+	loadFromRenderedText(&gameEnd[9].texture, timeTook, textColor);
+
+	gameEnd[9].rect.x = SCREEN_WIDTH / 2 - 200;
+	gameEnd[9].rect.y = SCREEN_HEIGHT / 9 * 3;
+	gameEnd[9].rect.w = 400;
+	gameEnd[9].rect.h = 50;
+}
+
 void renderText()
 {
 	const char* opts[] = {"Welcome to Connect4 Game Main Menu", "New Game", "Resume", "Load Game", "HighScore", "Quit",
@@ -613,6 +628,8 @@ void renderText()
 	loadFailedText();
 }
 
+// Freeing all the data the program took.
+// Saving the game before closing.
 void close(Game* game)
 {
 	if (!game->gameEnded && game->totalMoves != 0)

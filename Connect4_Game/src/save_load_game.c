@@ -61,12 +61,12 @@ void loadGame(Game* game, int n, int* currentState)
 	}
 
 	char filePath[30] = "./Data/saved_game/game";
-	strcat(filePath, num);
+	strcat(filePath, num);  // Combining the file path with name of the file.
 
 	FILE* fptr = fopen(filePath, "rb");
 	if (!fptr)
 	{
-		*currentState = 8;
+		*currentState = 8;  // 8 stands for Load Failed
 		printf("Failed to load game!\n");
 		return;
 	}
@@ -74,9 +74,11 @@ void loadGame(Game* game, int n, int* currentState)
 	int rows = getw(fptr);
 	int cols = getw(fptr);
 
+	// If the user tries to load a game with different dimensions,
+	// The program will tell him that the load Failed.
 	if (rows != ROWS || COLS != COLS)
 	{
-		*currentState = 8;
+		*currentState = 8;  // 8 stands for Load Failed
 		printf("Failed to load game!\n");
 		return;
 	}

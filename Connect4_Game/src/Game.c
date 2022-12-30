@@ -8,19 +8,20 @@ void runGame()
 	Game game = createNewGame();
 	enum State currentState = State_MainMenu;
 
+	// Initializing SDl.
 	if (!init())
 		printf("Failed to initialize!\n");
 	else
 	{
-		loadMedia(&game);
+		loadMedia(&game);  // Loading media for SDL.
 		
 		bool quit = false, typing = false;
 		SDL_Event e;
 
 		int x, y;
-		while (!quit)
+		while (!quit)  // The main loop.
 		{
-			while (SDL_WaitEvent(&e))
+			while (SDL_WaitEvent(&e))  // Getting event from the user.
 			{
 				if (e.type == SDL_QUIT || quit)
 				{
@@ -70,6 +71,9 @@ void runGame()
 						case SDLK_ESCAPE:
 							currentState = State_MainMenu;
 							break;
+						case SDLK_s:
+							saveGame(&game);
+							break;
 						default:
 							break;
 						}
@@ -100,20 +104,23 @@ void runGame()
 				
 				draw(&game, currentState, NULL);
 
+				// Checking if the game has ended.
+				// and if so, getting the player who won.
 				int winner = endGame(&game);
 				if (winner && !game.gameEnded)
 				{
 					currentState = State_WinnerName;
 					typing = true;
 					game.timeEnded = clock();
-					timeText(&game);
+					timeText(&game);  // Initializing the time text.
 				}
 
+				// Getting the name of the player who won.
 				if (winner == 1)
 					handleTyping(&e, &typing, &p1, &game, &currentState);
 				else if (winner == 2)
 					handleTyping(&e, &typing, &p2, &game, &currentState);
-				else if (winner == 3)
+				else if (winner == 3)  // Handling the Draw state.
 				{
 					currentState = State_Draw;
 					typing = false;
@@ -131,14 +138,9 @@ void handleMouseGamePlay(Game* game, int x, int y)
 {
 	int row = (y - (CIRCLE_SIZE + 10)) / (CIRCLE_SIZE + 10), col = x / (CIRCLE_SIZE + 10);
 
-	printf("row: %d  col: %d\n", row, col);
-
 	makeMove(game, col);
 
 	renderPlayerText(game);
-
-	printf("Score player1: %d\n", p1.score);
-	printf("Score player2: %d\n", p2.score);
 }
 
 void handleMouseMainMenu(int x, int y, bool* quit, enum State* currentState)
@@ -234,6 +236,8 @@ void handleMouseLoadGame(int x, int y, Game* game, enum State* currentState)
 
 void handleTyping(SDL_Event* e, bool* typing, Player* winner, Game* game, enum State* currentState)
 {
+	// Checking if the computer won.
+	// Don't take the name of the computer if the computer won.
 	if (game->ai && winner->color == 'g')
 	{
 		*currentState = State_ComputerWon;
@@ -242,6 +246,7 @@ void handleTyping(SDL_Event* e, bool* typing, Player* winner, Game* game, enum S
 		return;
 	}
 
+	// Taking the name of the player who won.
 	SDL_StartTextInput();
 
 	while (*typing)
@@ -278,6 +283,6 @@ void handleTyping(SDL_Event* e, bool* typing, Player* winner, Game* game, enum S
 
 	SDL_StopTextInput();
 	saveHighScore(winner->name, winner->score);
-	highScoreText();
+	highScoreText();  // Refreshing the high score board.
 	game->gameEnded = true;
 }
