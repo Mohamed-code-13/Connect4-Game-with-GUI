@@ -68,3 +68,4 @@ void renderPlayerText(Game* game);
 void close(Game* game);
 void endGameText(Player* p);
 void highScoreText();
+void timeText(Game* game);

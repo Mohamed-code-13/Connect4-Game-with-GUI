@@ -5,7 +5,7 @@ const char* pathsCirclesImages[] = { "./images/wC.png", "./images/rC.png", "./im
 
 Texture circles[Colors_TOTAL];
 Texture player_1_text, player_2_text;
-Button gameEnd[9];
+Button gameEnd[10];
 Button scores[200];
 int numOfScores;
 
@@ -214,6 +214,12 @@ void drawHighScore()
 	SDL_RenderPresent(gRenderer);
 }
 
+void drawTime()
+{
+	SDL_RenderFillRect(gRenderer, &gameEnd[9].rect);
+	render(&gameEnd[9].texture, gameEnd[9].rect.x + 20, gameEnd[9].rect.y);
+}
+
 void drawWinnerName(Player* p)
 {
 	if (p->color == 'r')
@@ -227,6 +233,7 @@ void drawWinnerName(Player* p)
 
 		render(&gameEnd[i].texture, gameEnd[i].rect.x + 40, gameEnd[i].rect.y);
 	}
+	drawTime();
 
 	SDL_RenderPresent(gRenderer);
 }
@@ -240,6 +247,7 @@ void drawDraw()
 		SDL_RenderFillRect(gRenderer, &gameEnd[i].rect);
 		render(&gameEnd[i].texture, gameEnd[i].rect.x + 20, gameEnd[i].rect.y);
 	}
+	drawTime();
 
 	SDL_RenderPresent(gRenderer);
 }
@@ -253,6 +261,7 @@ void drawComputerWon()
 		SDL_RenderFillRect(gRenderer, &gameEnd[i].rect);
 		render(&gameEnd[i].texture, gameEnd[i].rect.x + 20, gameEnd[i].rect.y);
 	}
+	drawTime();
 
 	SDL_RenderPresent(gRenderer);
 }
@@ -509,7 +518,7 @@ void endGameDrawText()
 	gameEnd[3].rect.h = 50;
 
 	gameEnd[4].rect.x = SCREEN_WIDTH / 2 - 200;
-	gameEnd[4].rect.y = SCREEN_HEIGHT / 9 * 5;
+	gameEnd[4].rect.y = SCREEN_HEIGHT / 9 * 6;
 	gameEnd[4].rect.w = 400;
 	gameEnd[4].rect.h = 50;
 }
@@ -532,6 +541,41 @@ void computerWonDraw()
 	gameEnd[6].rect.y = SCREEN_HEIGHT / 9 * 5;
 	gameEnd[6].rect.w = 400;
 	gameEnd[6].rect.h = 50;
+}
+
+void getTime(Game* game, char timeTook[70])
+{
+	game->timeUsed += ((int)(game->timeEnded - game->timeStarted)) / CLOCKS_PER_SEC;
+
+	int mins = game->timeUsed / 60;
+	int seconds = game->timeUsed % 60;
+
+	char mins_string[5];
+	char seconds_string[5];
+
+	sprintf(mins_string, "%d", mins);
+	sprintf(seconds_string, "%d", seconds);
+
+	strcat(timeTook, mins_string);
+	strcat(timeTook, " mins and ");
+
+	strcat(timeTook, seconds_string);
+	strcat(timeTook, " seconds.");
+}
+
+void timeText(Game* game)
+{
+	SDL_Color textColor = { 0x00, 0x00, 0x00 };
+
+	char timeTook[50] = "Time took: ";
+	getTime(game, timeTook);
+
+	loadFromRenderedText(&gameEnd[9].texture, timeTook, textColor);
+
+	gameEnd[9].rect.x = SCREEN_WIDTH / 2 - 200;
+	gameEnd[9].rect.y = SCREEN_HEIGHT / 9 * 3;
+	gameEnd[9].rect.w = 400;
+	gameEnd[9].rect.h = 50;
 }
 
 void loadFailedText()

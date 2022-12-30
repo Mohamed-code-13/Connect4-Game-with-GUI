@@ -34,6 +34,10 @@ void saveGame(Game* game)
 	putw(p1.score, fptr);
 	putw(p2.score, fptr);
 
+	game->timeEnded = clock();
+	game->timeUsed += ((int)(game->timeEnded - game->timeStarted)) / CLOCKS_PER_SEC;
+	putw(game->timeUsed, fptr);
+
 	fclose(fptr);
 }
 
@@ -69,14 +73,14 @@ void loadGame(Game* game, int n, int* currentState)
 
 	int rows = getw(fptr);
 	int cols = getw(fptr);
-	/*
+
 	if (rows != ROWS || COLS != COLS)
 	{
 		*currentState = 8;
 		printf("Failed to load game!\n");
 		return;
 	}
-	*/
+
 	for (int i = 0; i < ROWS; ++i)
 		fread(game->board[i], COLS * sizeof(char), 1, fptr);
 
@@ -89,6 +93,9 @@ void loadGame(Game* game, int n, int* currentState)
 
 	p1.score = getw(fptr);
 	p2.score = getw(fptr);
+
+	game->timeStarted = clock();
+	game->timeUsed = getw(fptr);
 
 	fclose(fptr);
 }

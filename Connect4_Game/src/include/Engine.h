@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "Configuration.h"
 #include "high_score.h"
 #include "computer.h"
@@ -21,6 +22,9 @@ typedef struct
 	int currMove, totalMoves;
 	bool p1First;
 	bool ai;
+
+	clock_t timeStarted, timeEnded;
+	int timeUsed;
 
 	bool gameEnded;
 } Game;

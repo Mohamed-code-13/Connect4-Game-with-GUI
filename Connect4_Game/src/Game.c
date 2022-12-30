@@ -105,6 +105,8 @@ void runGame()
 				{
 					currentState = State_WinnerName;
 					typing = true;
+					game.timeEnded = clock();
+					timeText(&game);
 				}
 
 				if (winner == 1)
@@ -188,6 +190,7 @@ void handleMouseModeOptions(int x, int y, Game* game, enum State* currentState)
 				*game = createNewGame();
 				break;
 			case BUTTONS_HvC:
+				*game = createNewGame();
 				game->ai = true;
 				*currentState = State_GamePlay;
 				break;
@@ -196,6 +199,7 @@ void handleMouseModeOptions(int x, int y, Game* game, enum State* currentState)
 			}
 		}
 	}
+	renderPlayerText(game);
 }
 
 void handleMouseLoadGame(int x, int y, Game* game, enum State* currentState)
@@ -223,9 +227,9 @@ void handleMouseLoadGame(int x, int y, Game* game, enum State* currentState)
 			default:
 				break;
 			}
-			renderPlayerText(game);
 		}
 	}
+	renderPlayerText(game);
 }
 
 void handleTyping(SDL_Event* e, bool* typing, Player* winner, Game* game, enum State* currentState)

@@ -14,6 +14,9 @@ Game createNewGame()
 	game.board = (char**)malloc(ROWS * sizeof(char*));
 	game.log = (int*)malloc(ROWS * COLS * sizeof(int));
 	game.gameEnded = false;
+
+	game.timeStarted = clock();
+	game.timeUsed = 0;
 	
 	initializeBoard(game.board);
 
