@@ -274,17 +274,19 @@ void handleTyping(SDL_Event* e, bool* typing, Player* winner, Game* game, enum S
 					break;
 				}
 				
+				// Deleting character when backspace is pressed.
 				if (e->type == SDL_KEYDOWN && e->key.keysym.sym == SDLK_BACKSPACE && strlen(winner->name) > 1)
 					winner->name[strlen(winner->name) - 1] = 0;
 
-				else if (e->type == SDL_TEXTINPUT)
+				// Inserting the character the user pressed in the winner's name.
+				else if (e->type == SDL_TEXTINPUT && strlen(winner->name) < 50)
 					strcat(winner->name, e->text.text);
 			}
 		}
 	}
 
 	SDL_StopTextInput();
-	saveHighScore(winner->name, winner->score);
+	saveHighScore(winner->name, winner->score, SCORES);
 	highScoreText();  // Refreshing the high score board.
 	game->gameEnded = true;
 }

@@ -57,8 +57,9 @@ int validDim(char* node)
 	for (int i = 0; i < strlen(digits); ++i)
 		if (!isdigit(digits[i]))
 			return -1;
-
-	return atoi(digits);
+	
+	int num = atoi(digits);
+	return (num <= 200) ? num : 200;
 }
 
 int parseXML(xmlNode* node)

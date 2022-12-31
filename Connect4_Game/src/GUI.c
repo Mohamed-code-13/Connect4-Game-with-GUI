@@ -448,7 +448,7 @@ void highScoreText()
 {
 	char** names = (char**)malloc(SCORES * sizeof(char*));
 	for (int i = 0; i < SCORES; ++i)
-		names[i] = (char*)malloc(50 * sizeof(char));
+		names[i] = (char*)malloc(60 * sizeof(char));
 
 	numOfScores = getHighScores(names, SCORES);
 	if (numOfScores == -1)

@@ -33,7 +33,7 @@ typedef struct
 {
 	char color;
 	int score;
-	char name[20];
+	char name[50];
 } Player;
 
 Player p1, p2;
