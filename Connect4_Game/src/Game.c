@@ -64,11 +64,9 @@ void runGame()
 								undoMove(&game);
 
 							undoMove(&game);
-							renderPlayerText(&game);
 							break;
 						case SDLK_RIGHT:
 							redoMove(&game);
-							renderPlayerText(&game);
 							break;
 						case SDLK_ESCAPE:
 							currentState = State_MainMenu;
@@ -105,6 +103,7 @@ void runGame()
 				}
 				
 				draw(&game, currentState, NULL);
+				renderPlayerText(&game);
 
 				// Checking if the game has ended.
 				// and if so, getting the player who won.
@@ -141,8 +140,6 @@ void handleMouseGamePlay(Game* game, int x, int y)
 	int row = (y - (CIRCLE_SIZE + 10)) / (CIRCLE_SIZE + 10), col = x / (CIRCLE_SIZE + 10);
 
 	makeMove(game, col);
-
-	renderPlayerText(game);
 }
 
 void handleMouseMainMenu(int x, int y, bool* quit, enum State* currentState)
@@ -203,7 +200,6 @@ void handleMouseModeOptions(int x, int y, Game* game, enum State* currentState)
 			}
 		}
 	}
-	renderPlayerText(game);
 }
 
 void handleMouseLoadGame(int x, int y, Game* game, enum State* currentState)
@@ -233,7 +229,6 @@ void handleMouseLoadGame(int x, int y, Game* game, enum State* currentState)
 			}
 		}
 	}
-	renderPlayerText(game);
 }
 
 void handleTyping(SDL_Event* e, bool* typing, Player* winner, Game* game, enum State* currentState)
