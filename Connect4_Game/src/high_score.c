@@ -68,15 +68,20 @@ void saveHighScore(char name[], int score, int h)
 		}
 	}
 
-	FILE* fptr = fopen("./Data/HighScores/highScore.txt", "w");
 	if (indexOfScoreToSave == -1)
 	{
+		FILE* fptr = fopen("./Data/HighScores/highScore.txt", "a");
+
 		fputs(scoreToSave, fptr);
 		fputc('\n', fptr);
+
+		fclose(fptr);
 	}
 
 	else if (indexOfScoreToSave != -2)
 	{
+		FILE* fptr = fopen("./Data/HighScores/highScore.txt", "w");
+
 		for (int i = 0; i < numOfScores; ++i)
 		{
 			if (i == indexOfScoreToSave)
@@ -89,9 +94,10 @@ void saveHighScore(char name[], int score, int h)
 			fputs(names[i], fptr);
 			fputc('\n', fptr);
 		}
+
+		fclose(fptr);
 	}
 
-	fclose(fptr);
 	for (int i = 0; i < h; ++i)
 		free(names[i]);
 	free(names);
