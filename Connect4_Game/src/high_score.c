@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 
 int getName_Score_fromFile(char line[], char nameFromFile[])
@@ -34,9 +35,16 @@ void formatNewScore(char scoreToSave[], char name[], int score)
 	strcat(scoreToSave, n);
 }
 
+void toLowerCase(char name[])
+{
+	for (int i = 0; i < strlen(name); ++i)
+		name[i] = tolower(name[i]);
+}
+
 void saveHighScore(char name[], int score, int h)
 {
 	name++;
+	toLowerCase(name);
 
 	char scoreToSave[60] = {0};
 	int indexOfScoreToSave = -1, indexOfSameName = -1;
