@@ -27,5 +27,5 @@ You can undo moves up to the first move using the **left arrow (<-)** from the k
 ### The Winning Page
 <img alt="Winning Page" src="Connect4_Game/images/winning.png">
 
-<h1>اى الجمداااان والعظمه يا غالى<h1>
+<h1>اى الجمداااان والعظمه دى يا غالى<h1>
   <h2>متقبلش البول ريكويست العبيط ده بقا +بحبك فى الله والله <h2>
